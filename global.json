@@ -1,0 +1,10 @@
+﻿{
+  "projects": [
+    "src",
+    "test",
+    "../PhantomNet-Core/src"
+  ],
+  "sdk": {
+    "version": "1.0.0-rc1-update1"
+  }
+}
