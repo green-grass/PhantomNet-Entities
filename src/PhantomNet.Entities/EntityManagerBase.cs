@@ -21,13 +21,13 @@ namespace PhantomNet.Entities
         #region Constructors
 
         protected EntityManagerBase(
-            IDisposable store,
+            IDisposable store, object entityAccessor,
             IEnumerable<IEntityValidator<TEntity, TSubEntity, TEntityManager>> entityValidators,
             ILookupNormalizer keyNormalizer,
             IEntityCodeGenerator<TEntity, TEntityManager> codeGenerator,
             EntityErrorDescriber errors,
             ILogger<EntityManagerBase<TEntity, TSubEntity, TEntityManager>> logger)
-            : base(store, entityValidators, keyNormalizer, codeGenerator, errors, logger)
+            : base(store, entityAccessor, entityValidators, keyNormalizer, codeGenerator, errors, logger)
         {
             if (entityValidators != null)
             {
@@ -70,7 +70,7 @@ namespace PhantomNet.Entities
 
             if (SupportsScopedNameBasedEntity)
             {
-                await NormalizeEntityNameAsync(entity);
+                NormalizeEntityName(entity);
             }
         }
 
@@ -80,7 +80,7 @@ namespace PhantomNet.Entities
 
             if (SupportsScopedNameBasedEntity)
             {
-                await NormalizeEntityNameAsync(entity);
+                NormalizeEntityName(entity);
             }
         }
 
@@ -90,7 +90,7 @@ namespace PhantomNet.Entities
 
             if (SupportsMasterDetailsEntity)
             {
-                var details = await MasterDetailsStore.GetDetailsAsync(entity, CancellationToken);
+                var details = MasterDetailsEntityAccessor.GetDetails(entity);
                 var tasks = new List<Task<EntityResult>>(details.Count);
                 foreach (var detail in details)
                 {
@@ -126,7 +126,7 @@ namespace PhantomNet.Entities
             }
             if (errors.Count > 0)
             {
-                Logger.LogWarning(0, "SubEntity {subEntityId} validation failed: {errors}.", await GetSubEntityIdAsync(subEntity), string.Join(", ", errors.Select(e => e.Code)));
+                Logger.LogWarning(0, "SubEntity {subEntityId} validation failed: {errors}.", SupportsEntityWithSubEntity ? EntityWithSubEntityAccessor.GetId(subEntity) : null, string.Join(", ", errors.Select(e => e.Code)));
                 return EntityResult.Failed(errors.ToArray());
             }
             return EntityResult.Success;
@@ -140,36 +140,12 @@ namespace PhantomNet.Entities
     {
         #region Properties
 
-        protected virtual bool SupportsReadOnlyEntityWithSubEntity
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return Store is IReadOnlyEntityStore<TEntity, TSubEntity>;
-            }
-        }
-
-        protected virtual IReadOnlyEntityStore<TEntity> ReadOnlyEntityWithSubEntityStore
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var store = Store as IReadOnlyEntityStore<TEntity, TSubEntity>;
-                if (store == null)
-                {
-                    throw new NotSupportedException(Resources.StoreNotIReadOnlyEntityWithSubEntityStore);
-                }
-
-                return store;
-            }
-        }
-
         protected virtual bool SupportsEntityWithSubEntity
         {
             get
             {
                 ThrowIfDisposed();
-                return Store is IEntityStore<TEntity, TSubEntity>;
+                return Store is IEntityStore<TEntity, TSubEntity> && Accessor is IEntityAccessor<TEntity, TSubEntity>;
             }
         }
 
@@ -188,19 +164,19 @@ namespace PhantomNet.Entities
             }
         }
 
-        #endregion
-
-        #region Public Operations
-
-        protected virtual Task<string> GetSubEntityIdAsync(TSubEntity subEntity)
+        protected virtual IEntityAccessor<TEntity, TSubEntity> EntityWithSubEntityAccessor
         {
-            ThrowIfDisposed();
-            if (subEntity == null)
+            get
             {
-                throw new ArgumentNullException(nameof(subEntity));
-            }
+                var accessor = Accessor as IEntityAccessor<TEntity, TSubEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
 
-            return EntityWithSubEntityStore.GetIdAsync(subEntity, CancellationToken);
+                return accessor;
+            }
         }
 
         #endregion
@@ -290,7 +266,7 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is IScopedNameBasedEntityStore<TEntity, TSubEntity>;
+                return Store is IScopedNameBasedEntityStore<TEntity, TSubEntity> && Accessor is IScopedNameBasedEntityAccessor<TEntity, TSubEntity>;
             }
         }
 
@@ -306,6 +282,21 @@ namespace PhantomNet.Entities
                 }
 
                 return store;
+            }
+        }
+
+        protected virtual IScopedNameBasedEntityAccessor<TEntity, TSubEntity> ScopedNameBasedEntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as IScopedNameBasedEntityAccessor<TEntity, TSubEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
             }
         }
 
@@ -331,76 +322,20 @@ namespace PhantomNet.Entities
             return entity;
         }
 
-        protected override Task<string> GetEntityNameAsync(TEntity entity)
-        {
-            if (!SupportsScopedNameBasedEntity && SupportsNameBasedEntity)
-            {
-                return base.GetEntityNameAsync(entity);
-            }
-
-            ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            return ScopedNameBasedStore.GetNameAsync(entity, CancellationToken);
-        }
-
-        protected override async Task<EntityResult> SetEntityNameAsync(TEntity entity, string name)
-        {
-            if (!SupportsScopedNameBasedEntity && SupportsNameBasedEntity)
-            {
-                return await base.SetEntityNameAsync(entity, name);
-            }
-
-            ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            await ScopedNameBasedStore.SetNameAsync(entity, name, CancellationToken);
-            return await UpdateEntityInternalAsync(entity);
-        }
-
-        protected virtual Task<TSubEntity> GetEntityScope(TEntity entity)
-        {
-            ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            return ScopedNameBasedStore.GetScopeAsync(entity, CancellationToken);
-        }
-
-        protected virtual async Task<EntityResult> SetEntityScopeAsync(TEntity entity, TSubEntity scope)
-        {
-            ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            await ScopedNameBasedStore.SetScopeAsync(entity, scope, CancellationToken);
-            return await UpdateEntityInternalAsync(entity);
-        }
-
         #endregion
 
         #region Helpers
 
-        protected override async Task NormalizeEntityNameAsync(TEntity entity)
+        protected override void NormalizeEntityName(TEntity entity)
         {
             if (!SupportsScopedNameBasedEntity && SupportsNameBasedEntity)
             {
-                await base.NormalizeEntityNameAsync(entity);
+                base.NormalizeEntityName(entity);
                 return;
             }
 
-            var normalizedName = NormalizeEntityKey(await GetEntityNameAsync(entity));
-            await ScopedNameBasedStore.SetNormalizedNameAsync(entity, normalizedName, CancellationToken);
+            var normalizedName = NormalizeEntityKey(ScopedNameBasedEntityAccessor.GetName(entity));
+            ScopedNameBasedEntityAccessor.SetNormalizedName(entity, normalizedName);
         }
 
         #endregion
@@ -416,7 +351,7 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is IMasterDetailsEntityStore<TEntity, TSubEntity>;
+                return Store is IMasterDetailsEntityStore<TEntity, TSubEntity> && Accessor is IMasterDetailsEntityAccessor<TEntity, TSubEntity>;
             }
         }
 
@@ -435,6 +370,21 @@ namespace PhantomNet.Entities
             }
         }
 
+        protected virtual IMasterDetailsEntityAccessor<TEntity, TSubEntity> MasterDetailsEntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as IMasterDetailsEntityAccessor<TEntity, TSubEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
+            }
+        }
+
         #endregion
     }
 
@@ -446,7 +396,7 @@ namespace PhantomNet.Entities
         #region Constructors
 
         protected EntityManagerBase(
-            IDisposable store,
+            IDisposable store, object entityAccessor,
             IEnumerable<IEntityValidator<TEntity, TEntityManager>> entityValidators,
             ILookupNormalizer keyNormalizer,
             IEntityCodeGenerator<TEntity, TEntityManager> codeGenerator,
@@ -467,6 +417,7 @@ namespace PhantomNet.Entities
             }
 
             Store = store;
+            Accessor = entityAccessor;
             KeyNormalizer = keyNormalizer;
             CodeGenerator = codeGenerator;
             ErrorDescriber = errors;
@@ -499,6 +450,8 @@ namespace PhantomNet.Entities
         protected ILogger Logger { get; set; }
 
         protected IDisposable Store { get; }
+
+        protected object Accessor { get; }
 
         protected virtual IQueryable<TEntity> Entities
         {
@@ -552,9 +505,9 @@ namespace PhantomNet.Entities
         {
             if (SupportsCodeBasedEntity)
             {
-                if (await GetEntityCodeAsync(entity) == null && CodeGenerator != null)
+                if (CodeBasedEntityAccessor.GetCode(entity) == null && CodeGenerator != null)
                 {
-                    await UpdateEntityCodeAsync(entity, await GenerateEntityCodeAsync(entity));
+                    CodeBasedEntityAccessor.SetCode(entity, await GenerateEntityCodeAsync(entity));
                 }
             }
         }
@@ -563,19 +516,19 @@ namespace PhantomNet.Entities
         {
             if (SupportsCodeBasedEntity)
             {
-                await NormalizeEntityCodeAsync(entity);
+                NormalizeEntityCode(entity);
             }
 
             if (SupportsNameBasedEntity)
             {
-                await NormalizeEntityNameAsync(entity);
+                NormalizeEntityName(entity);
             }
 
             if (SupportsTimeTrackedEntity)
             {
                 var date = DateTime.Now;
-                await UpdateEntityDataCreateDateAsync(entity, date);
-                await UpdateEntityDataLastModifyDateAsync(entity, date);
+                TimeTrackedEntityAccessor.SetDataCreateDate(entity, date);
+                TimeTrackedEntityAccessor.SetDataLastModifyDate(entity, date);
             }
             await Task.FromResult(0);
         }
@@ -584,17 +537,17 @@ namespace PhantomNet.Entities
         {
             if (SupportsCodeBasedEntity)
             {
-                await NormalizeEntityCodeAsync(entity);
+                NormalizeEntityCode(entity);
             }
 
             if (SupportsNameBasedEntity)
             {
-                await NormalizeEntityNameAsync(entity);
+                NormalizeEntityName(entity);
             }
 
             if (SupportsTimeTrackedEntity)
             {
-                await UpdateEntityDataLastModifyDateAsync(entity);
+                TimeTrackedEntityAccessor.SetDataLastModifyDate(entity, DateTime.Now);
             }
             await Task.FromResult(0);
         }
@@ -612,7 +565,7 @@ namespace PhantomNet.Entities
             }
             if (errors.Count > 0)
             {
-                Logger.LogWarning(0, "Entity {entityId} validation failed: {errors}.", await GetEntityIdAsync(entity), string.Join(", ", errors.Select(e => e.Code)));
+                Logger.LogWarning(0, "Entity {entityId} validation failed: {errors}.", SupportsEntity ? EntityAccessor.GetId(entity) : null, string.Join(", ", errors.Select(e => e.Code)));
                 return EntityResult.Failed(errors.ToArray());
             }
             return EntityResult.Success;
@@ -662,36 +615,12 @@ namespace PhantomNet.Entities
     {
         #region Properties
 
-        protected virtual bool SupportsReadOnlyEntity
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return Store is IReadOnlyEntityStore<TEntity>;
-            }
-        }
-
-        protected virtual IReadOnlyEntityStore<TEntity> ReadOnlyEntityStore
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var store = Store as IReadOnlyEntityStore<TEntity>;
-                if (store == null)
-                {
-                    throw new NotSupportedException(Resources.StoreNotIReadOnlyEntityStore);
-                }
-
-                return store;
-            }
-        }
-
         protected virtual bool SupportsEntity
         {
             get
             {
                 ThrowIfDisposed();
-                return Store is IEntityStore<TEntity>;
+                return Store is IEntityStore<TEntity> && Accessor is IEntityAccessor<TEntity>;
             }
         }
 
@@ -707,6 +636,21 @@ namespace PhantomNet.Entities
                 }
 
                 return store;
+            }
+        }
+
+        protected virtual IEntityAccessor<TEntity> EntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as IEntityAccessor<TEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
             }
         }
 
@@ -776,17 +720,6 @@ namespace PhantomNet.Entities
             return entity;
         }
 
-        protected virtual Task<string> GetEntityIdAsync(TEntity entity)
-        {
-            ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            return EntityStore.GetIdAsync(entity, CancellationToken);
-        }
-
         protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(string search, int? pageNumber, int? pageSize, string sort, bool reverse)
         {
             ThrowIfDisposed();
@@ -821,18 +754,18 @@ namespace PhantomNet.Entities
             var offset = ((pageNumber - 1) * pageSize) ?? 0;
             var limit = pageSize ?? int.MaxValue;
 
-            result.TotalCount = await ReadOnlyEntityStore.CountAsync(models, CancellationToken);
+            result.TotalCount = await EntityStore.CountAsync(models, CancellationToken);
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                models = ReadOnlyEntityStore.Filter(models, NormalizeEntityKey(search));
+                models = EntityStore.Filter(models, NormalizeEntityKey(search));
             }
-            result.FilterredCount = await ReadOnlyEntityStore.CountAsync(models, CancellationToken);
+            result.FilterredCount = await EntityStore.CountAsync(models, CancellationToken);
 
-            models = ReadOnlyEntityStore.PreSort(models);
+            models = EntityStore.PreSort(models);
             if (string.IsNullOrWhiteSpace(sort))
             {
-                models = ReadOnlyEntityStore.DefaultSort(models);
+                models = EntityStore.DefaultSort(models);
             }
             else
             {
@@ -915,7 +848,7 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is ITimeTrackedEntityStore<TEntity>;
+                return Store is ITimeTrackedEntityStore<TEntity> && Accessor is ITimeTrackedEntityAccessor<TEntity>;
             }
         }
 
@@ -934,6 +867,21 @@ namespace PhantomNet.Entities
             }
         }
 
+        protected virtual ITimeTrackedEntityAccessor<TEntity> TimeTrackedEntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as ITimeTrackedEntityAccessor<TEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
+            }
+        }
+
         #endregion
 
         #region Public Operations
@@ -942,74 +890,6 @@ namespace PhantomNet.Entities
         {
             ThrowIfDisposed();
             var entity = await TimeTrackedEntityStore.FindLatestAsync(CancellationToken);
-
-            if (entity != null && SupportsEagerLoadingEntity)
-            {
-                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
-            }
-
-            return entity;
-        }
-
-        #endregion
-
-        #region Helpers
-
-        protected virtual Task UpdateEntityDataCreateDateAsync(TEntity entity, DateTime date)
-        {
-            return TimeTrackedEntityStore.SetDataCreateDateAsync(entity, date, CancellationToken);
-        }
-
-        protected virtual Task UpdateEntityDataLastModifyDateAsync(TEntity entity, DateTime? date = null)
-        {
-            return TimeTrackedEntityStore.SetDataLastModifyDateAsync(entity, date ?? DateTime.Now, CancellationToken);
-        }
-
-        #endregion
-    }
-
-    // ReadOnlyCodeBasedEntity
-    partial class EntityManagerBase<TEntity, TEntityManager>
-    {
-        #region Properties
-
-        protected virtual bool SupportsReadOnlyCodeBasedEntity
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return Store is IReadOnlyCodeBasedEntityStore<TEntity>;
-            }
-        }
-
-        protected virtual IReadOnlyCodeBasedEntityStore<TEntity> ReadOnlyCodeBasedEntityStore
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var store = Store as IReadOnlyCodeBasedEntityStore<TEntity>;
-                if (store == null)
-                {
-                    throw new NotSupportedException(Resources.StoreNotIReadOnlyCodeBasedEntityStore);
-                }
-
-                return store;
-            }
-        }
-
-        #endregion
-
-        #region Public Operations
-
-        protected virtual async Task<TEntity> FindEntityByCodeAsync(string code)
-        {
-            ThrowIfDisposed();
-            if (code == null)
-            {
-                throw new ArgumentNullException(nameof(code));
-            }
-
-            var entity = await ReadOnlyCodeBasedEntityStore.FindByCodeAsync(NormalizeEntityKey(code), CancellationToken);
 
             if (entity != null && SupportsEagerLoadingEntity)
             {
@@ -1032,7 +912,7 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is ICodeBasedEntityStore<TEntity>;
+                return Store is ICodeBasedEntityStore<TEntity> && Accessor is ICodeBasedEntityAccessor<TEntity>;
             }
         }
 
@@ -1051,41 +931,51 @@ namespace PhantomNet.Entities
             }
         }
 
+        protected virtual ICodeBasedEntityAccessor<TEntity> CodeBasedEntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as ICodeBasedEntityAccessor<TEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
+            }
+        }
+
         #endregion
 
         #region Public Operations
 
-        protected virtual Task<string> GetEntityCodeAsync(TEntity entity)
+        protected virtual async Task<TEntity> FindEntityByCodeAsync(string code)
         {
             ThrowIfDisposed();
-            if (entity == null)
+            if (code == null)
             {
-                throw new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException(nameof(code));
             }
 
-            return CodeBasedEntityStore.GetCodeAsync(entity, CancellationToken);
-        }
+            var entity = await CodeBasedEntityStore.FindByCodeAsync(NormalizeEntityKey(code), CancellationToken);
 
-        protected virtual async Task<EntityResult> SetEntityCodeAsync(TEntity entity, string code)
-        {
-            ThrowIfDisposed();
-            if (entity == null)
+            if (entity != null && SupportsEagerLoadingEntity)
             {
-                throw new ArgumentNullException(nameof(entity));
+                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
             }
 
-            await CodeBasedEntityStore.SetCodeAsync(entity, code, CancellationToken);
-            return await UpdateEntityInternalAsync(entity);
+            return entity;
         }
 
         #endregion
 
         #region Helpers
 
-        protected virtual async Task NormalizeEntityCodeAsync(TEntity entity)
+        protected virtual void NormalizeEntityCode(TEntity entity)
         {
-            var normalizedCode = NormalizeEntityKey(await GetEntityCodeAsync(entity));
-            await CodeBasedEntityStore.SetCodeAsync(entity, normalizedCode, CancellationToken);
+            var normalizedCode = NormalizeEntityKey(CodeBasedEntityAccessor.GetCode(entity));
+            CodeBasedEntityAccessor.SetCode(entity, normalizedCode);
         }
 
         protected virtual Task<string> GenerateEntityCodeAsync(TEntity entity)
@@ -1096,11 +986,6 @@ namespace PhantomNet.Entities
             }
 
             return CodeGenerator.GenerateCodeAsync((TEntityManager)this, entity, CancellationToken);
-        }
-
-        protected virtual Task UpdateEntityCodeAsync(TEntity entity, string code)
-        {
-            return CodeBasedEntityStore.SetCodeAsync(entity, code, CancellationToken);
         }
 
         #endregion
@@ -1116,7 +1001,7 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is INameBasedEntityStore<TEntity>;
+                return Store is INameBasedEntityStore<TEntity> && Accessor is INameBasedEntityAccessor<TEntity>;
             }
         }
 
@@ -1132,6 +1017,21 @@ namespace PhantomNet.Entities
                 }
 
                 return store;
+            }
+        }
+
+        protected virtual INameBasedEntityAccessor<TEntity> NameBasedEntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as INameBasedEntityAccessor<TEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
             }
         }
 
@@ -1157,37 +1057,14 @@ namespace PhantomNet.Entities
             return entity;
         }
 
-        protected virtual Task<string> GetEntityNameAsync(TEntity entity)
-        {
-            ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            return NameBasedEntityStore.GetNameAsync(entity, CancellationToken);
-        }
-
-        protected virtual async Task<EntityResult> SetEntityNameAsync(TEntity entity, string name)
-        {
-            ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            await NameBasedEntityStore.SetNameAsync(entity, name, CancellationToken);
-            return await UpdateEntityInternalAsync(entity);
-        }
-
         #endregion
 
         #region Helpers
 
-        protected virtual async Task NormalizeEntityNameAsync(TEntity entity)
+        protected virtual void NormalizeEntityName(TEntity entity)
         {
-            var normalizedName = NormalizeEntityKey(await GetEntityNameAsync(entity));
-            await NameBasedEntityStore.SetNormalizedNameAsync(entity, normalizedName, CancellationToken);
+            var normalizedName = NormalizeEntityKey(NameBasedEntityAccessor.GetName(entity));
+            NameBasedEntityAccessor.SetNormalizedName(entity, normalizedName);
         }
 
         #endregion

@@ -8,9 +8,5 @@ namespace PhantomNet.Entities
         where TEntityScope : class
     {
         Task<TEntity> FindByNameAsync(string name, TEntityScope scope);
-
-        Task<string> GetNameAsync(TEntity entity);
-
-        Task<TEntityScope> GetScopeAsync(TEntity entity);
     }
 }

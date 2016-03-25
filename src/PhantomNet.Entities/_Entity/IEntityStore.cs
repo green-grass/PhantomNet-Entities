@@ -6,15 +6,12 @@ using System.Threading.Tasks;
 namespace PhantomNet.Entities
 {
     public interface IEntityStore<TEntity, TSubEntity> :
-        IReadOnlyEntityStore<TEntity, TSubEntity>,
         IEntityStore<TEntity>
         where TEntity : class
         where TSubEntity : class
-    {
-        Task<string> GetIdAsync(TSubEntity subEntity, CancellationToken cancellationToken);
-    }
+    { }
 
-    public interface IEntityStore<TEntity> : IReadOnlyEntityStore<TEntity>
+    public interface IEntityStore<TEntity> : IDisposable
         where TEntity : class
     {
         Task<EntityResult> CreateAsync(TEntity entity, CancellationToken cancellationToken);
@@ -23,17 +20,6 @@ namespace PhantomNet.Entities
 
         Task<EntityResult> DeleteAsync(TEntity entity, CancellationToken cancellationToken);
 
-        Task<string> GetIdAsync(TEntity entity, CancellationToken cancellationToken);
-    }
-
-    public interface IReadOnlyEntityStore<TEntity, TSubEntity> : IReadOnlyEntityStore<TEntity>
-        where TEntity : class
-        where TSubEntity : class
-    { }
-
-    public interface IReadOnlyEntityStore<TEntity> : IDisposable
-        where TEntity : class
-    {
         Task<T> FindByIdAsync<T>(string id, CancellationToken cancellationToken)
             where T : class;
 

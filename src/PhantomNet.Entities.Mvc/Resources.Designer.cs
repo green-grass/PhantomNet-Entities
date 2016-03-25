@@ -76,14 +76,5 @@ namespace PhantomNet.Entities.Mvc {
                 return ResourceManager.GetString("ManagerNotIGroupedEntityManager", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Manager does not implement IReadOnlyEntityManager&lt;TEntity&gt;..
-        /// </summary>
-        internal static string ManagerNotIReadOnlyEntityManager {
-            get {
-                return ResourceManager.GetString("ManagerNotIReadOnlyEntityManager", resourceCulture);
-            }
-        }
     }
 }

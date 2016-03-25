@@ -8,7 +8,5 @@ namespace PhantomNet.Entities
     public interface IMasterDetailsEntityStore<TEntity, TEntityDetail> : IDisposable
         where TEntity : class
         where TEntityDetail : class
-    {
-        Task<ICollection<TEntityDetail>> GetDetailsAsync(TEntity entity, CancellationToken cancellationToken);
-    }
+    { }
 }

@@ -12,99 +12,52 @@ namespace PhantomNet.Entities.EntityFramework
 {
     public static class CodeBasedEntityStoreExtensions
     {
-        public static Task<string> GetEntityCodeAsync<TEntity, TContext, TKey>(
+        public static Task<TEntity> FindEntityByCodeAsync<TEntity, TContext, TKey>(
             this ICodeBasedEntityStoreMarker<TEntity, TContext, TKey> store,
-            TEntity entity, CancellationToken cancellationToken)
+            string normalizedCode, CancellationToken cancellationToken)
             where TEntity : class, ICodeWiseEntity
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return GetEntityCodeAsync(store, entity, cancellationToken, null, null);
+            return FindEntityByCodeAsync(store, normalizedCode, cancellationToken, null, null);
         }
 
-        public static Task<string> GetEntityCodeAsync<TEntity, TContext, TKey>(
+        public static Task<TEntity> FindEntityByCodeAsync<TEntity, TContext, TKey>(
             this ICodeBasedEntityStoreMarker<TEntity, TContext, TKey> store,
-            TEntity entity, CancellationToken cancellationToken,
+            string normalizedCode, CancellationToken cancellationToken,
             Expression<Func<TEntity, string>> codeSelector,
-            Func<string> directGetCode)
+            Func<Task<TEntity>> directFindByCodeAsync)
             where TEntity : class
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
             cancellationToken.ThrowIfCancellationRequested();
             store.ThrowIfDisposed();
-            if (entity == null)
+            if (normalizedCode == null)
             {
-                throw new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException(nameof(normalizedCode));
             }
 
-            if (directGetCode == null &&
+            if (directFindByCodeAsync == null &&
                 codeSelector == null &&
-                entity is ICodeWiseEntity)
+                typeof(ICodeWiseEntity).IsAssignableFrom(typeof(TEntity)) &&
+                store is IQueryableEntityStore<TEntity>)
             {
-                return Task.FromResult(((ICodeWiseEntity)entity).Code);
+                return ((IQueryableEntityStore<TEntity>)store).Entities.SingleOrDefaultAsync(x => ((ICodeWiseEntity)x).Code == normalizedCode, cancellationToken);
             }
             else if (codeSelector != null)
             {
-                return Task.FromResult((codeSelector.Compile().Invoke(entity)));
+                return ((IQueryableEntityStore<TEntity>)store).Entities.SingleOrDefaultAsync(x => codeSelector.Compile().Invoke(x) == normalizedCode, cancellationToken);
             }
             else
             {
-                if (directGetCode == null)
+                if (directFindByCodeAsync == null)
                 {
-                    throw new ArgumentNullException(nameof(directGetCode));
+                    throw new ArgumentNullException(nameof(directFindByCodeAsync));
                 }
 
-                return Task.FromResult(directGetCode());
+                return directFindByCodeAsync();
             }
-        }
-
-        public static Task SetEntityCodeAsync<TEntity, TContext, TKey>(
-            this ICodeBasedEntityStoreMarker<TEntity, TContext, TKey> store,
-            TEntity entity, string code, CancellationToken cancellationToken)
-            where TEntity : class, ICodeWiseEntity
-            where TContext : DbContext
-            where TKey : IEquatable<TKey>
-        {
-            return SetEntityCodeAsync(store, entity, code, cancellationToken, null, null);
-        }
-
-        public static Task SetEntityCodeAsync<TEntity, TContext, TKey>(
-            this ICodeBasedEntityStoreMarker<TEntity, TContext, TKey> store,
-            TEntity entity, string code, CancellationToken cancellationToken,
-            Expression<Func<TEntity, string>> codeSelector,
-            Action directSetCode)
-            where TEntity : class
-            where TContext : DbContext
-            where TKey : IEquatable<TKey>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            store.ThrowIfDisposed();
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            if (directSetCode == null &&
-                codeSelector == null &&
-                entity is ICodeWiseEntity)
-            {
-                ((ICodeWiseEntity)entity).Code = code;
-            }
-            else if (codeSelector != null)
-            {
-                codeSelector.GetPropertyAccess().SetValue(entity, code);
-            }
-            else
-            {
-                if (directSetCode == null)
-                {
-                    throw new ArgumentNullException(nameof(directSetCode));
-                }
-
-                directSetCode();
-            }
-            return Task.FromResult(0);
         }
     }
 }

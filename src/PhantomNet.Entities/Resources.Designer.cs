@@ -69,6 +69,15 @@ namespace PhantomNet.Entities {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to An unknown failure has occured..
+        /// </summary>
+        internal static string DefaultError {
+            get {
+                return ResourceManager.GetString("DefaultError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Generic class {0} must also be used as class parameter..
         /// </summary>
         internal static string GenericClassNotMatched {
@@ -155,33 +164,6 @@ namespace PhantomNet.Entities {
         internal static string StoreNotIQueryableEntityWithSubEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIQueryableEntityWithSubEntityStore", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Store does not implement IReadOnlyCodeBasedEntityStore&lt;TEntity&gt;..
-        /// </summary>
-        internal static string StoreNotIReadOnlyCodeBasedEntityStore {
-            get {
-                return ResourceManager.GetString("StoreNotIReadOnlyCodeBasedEntityStore", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Store does not implement IReadOnlyEntityStore&lt;TEntity&gt;..
-        /// </summary>
-        internal static string StoreNotIReadOnlyEntityStore {
-            get {
-                return ResourceManager.GetString("StoreNotIReadOnlyEntityStore", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Store does not implement IReadOnlyEntityStore&lt;TEntity, TSubEntity&gt;..
-        /// </summary>
-        internal static string StoreNotIReadOnlyEntityWithSubEntityStore {
-            get {
-                return ResourceManager.GetString("StoreNotIReadOnlyEntityWithSubEntityStore", resourceCulture);
             }
         }
         

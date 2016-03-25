@@ -8,9 +8,5 @@ namespace PhantomNet.Entities
         where TEntity : class
     {
         Task<TEntity> FindLatestAsync(CancellationToken cancellationToken);
-
-        Task SetDataCreateDateAsync(TEntity entity, DateTime date, CancellationToken cancellationToken);
-
-        Task SetDataLastModifyDateAsync(TEntity entity, DateTime date, CancellationToken cancellationToken);
     }
 }

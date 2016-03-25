@@ -123,7 +123,4 @@
   <data name="ManagerNotIGroupedEntityManager" xml:space="preserve">
     <value>Manager does not implement IGroupedEntityManager&lt;TEntity, TSubEntity&gt;.</value>
   </data>
-  <data name="ManagerNotIReadOnlyEntityManager" xml:space="preserve">
-    <value>Manager does not implement IReadOnlyEntityManager&lt;TEntity&gt;.</value>
-  </data>
 </root>

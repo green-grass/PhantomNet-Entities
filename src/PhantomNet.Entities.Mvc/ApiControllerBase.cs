@@ -135,30 +135,6 @@ namespace PhantomNet.Entities.Mvc
     {
         #region Properties
 
-        protected virtual bool SupportsReadOnlyEntity
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return Manager is IReadOnlyEntityManager<TModel>;
-            }
-        }
-
-        protected virtual IReadOnlyEntityManager<TModel> ReadOnlyEntityManager
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var manager = Manager as IReadOnlyEntityManager<TModel>;
-                if (manager == null)
-                {
-                    throw new NotSupportedException(Resources.ManagerNotIReadOnlyEntityManager);
-                }
-
-                return manager;
-            }
-        }
-
         protected virtual bool SupportsEntity
         {
             get
@@ -195,7 +171,7 @@ namespace PhantomNet.Entities.Mvc
         protected virtual async Task<IEnumerable<TModel>> GetModels(string token, string search, int? pageNumber, int? pageSize, string sort, bool reverse,
             Action<TModel> preProcessReturnedModel)
         {
-            var result = await ReadOnlyEntityManager.SearchAsync(search, pageNumber, pageSize, sort, reverse);
+            var result = await EntityManager.SearchAsync(search, pageNumber, pageSize, sort, reverse);
             Response.Headers["total-count"] = result.TotalCount.ToString();
             Response.Headers["filtered-count"] = result.FilterredCount.ToString();
             Response.Headers["token"] = token;
@@ -222,7 +198,7 @@ namespace PhantomNet.Entities.Mvc
                 throw new ArgumentNullException(nameof(id));
             }
 
-            var result = await ReadOnlyEntityManager.FindByIdAsync(id);
+            var result = await EntityManager.FindByIdAsync(id);
             if (preProcessReturnedModel != null)
             {
                 preProcessReturnedModel(result);

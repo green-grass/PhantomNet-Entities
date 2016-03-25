@@ -29,7 +29,8 @@
     "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
     "System.Globalization.Extensions": "4.0.1-beta-23516",
     "System.Linq.Queryable": "4.0.1-beta-23516",
-    "PhantomNet.Core": "1.0.0-*"
+    "PhantomNet.Core": "1.0.0-*",
+    "PhantomNet.Entities.EntityMarkers": "1.0.2-*"
   },
   "namedResource": {
     "PhantomNet.Entities.Resources": "Resources.resx"

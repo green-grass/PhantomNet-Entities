@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
@@ -11,43 +13,67 @@ namespace PhantomNet.Entities.EntityFramework
 {
     public static partial class EntityStoreExtensions
     {
-        public static Task<string> GetSubEntityIdAsync<TEntity, TSubEntity, TContext, TKey>(
-            this IEntityStoreMarker<TEntity, TSubEntity, TContext, TKey> store,
-            TSubEntity subEntity, CancellationToken cancellationToken)
-            where TEntity : class
-            where TSubEntity : class
+        public static Task<T> FindEntityOrSubEntityByIdAsync<TEntity, TSubEntity, TContext, TKey, T>(
+            this IEntityStoreMarker<TEntity, TContext, TKey> store,
+            string id, CancellationToken cancellationToken)
+            where TEntity : class, IIdWiseEntity<TKey>
+            where TSubEntity : class, IIdWiseEntity<TKey>
             where TContext : DbContext
             where TKey : IEquatable<TKey>
+            where T : class
         {
-            return GetSubEntityIdAsync(store, subEntity, cancellationToken, null);
+            return FindEntityOrSubEntityByIdAsync<TEntity, TSubEntity, TContext, TKey, T>(store, id, cancellationToken, null, null);
         }
 
-        public static Task<string> GetSubEntityIdAsync<TEntity, TSubEntity, TContext, TKey>(
-            this IEntityStoreMarker<TEntity, TSubEntity, TContext, TKey> store,
-            TSubEntity subEntity, CancellationToken cancellationToken,
-            Func<TKey> directGetId)
+        public static async Task<T> FindEntityOrSubEntityByIdAsync<TEntity, TSubEntity, TContext, TKey, T>(
+            this IEntityStoreMarker<TEntity, TContext, TKey> store,
+            string id, CancellationToken cancellationToken,
+            Func<TKey, Task<TEntity>> directFindEntityByIdAsync,
+            Func<TKey, Task<TSubEntity>> directFindSubEntityByIdAsync)
             where TEntity : class
             where TSubEntity : class
             where TContext : DbContext
             where TKey : IEquatable<TKey>
+            where T : class
         {
             cancellationToken.ThrowIfCancellationRequested();
             store.ThrowIfDisposed();
-            if (subEntity == null)
+            if (id == null)
             {
-                throw new ArgumentNullException(nameof(subEntity));
+                throw new ArgumentNullException(nameof(id));
             }
 
-            TKey id;
-            if (directGetId == null && subEntity is IIdWiseEntity<TKey>)
+            var key = ConvertIdFromString<TKey>(id);
+            if (typeof(T) == typeof(TEntity))
             {
-                id = ((IIdWiseEntity<TKey>)subEntity).Id;
+                if (directFindEntityByIdAsync == null
+                    && typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity))
+                    && store is IQueryableEntityStore<TEntity, TSubEntity>)
+                {
+                    return await ((IQueryableEntityStore<TEntity, TSubEntity>)store).Entities
+                        .SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken) as T;
+                }
+                else
+                {
+                    return await directFindEntityByIdAsync(key) as T;
+                }
             }
-            else
+            else if (typeof(T) == typeof(TSubEntity))
             {
-                id = directGetId();
+                if (directFindSubEntityByIdAsync == null
+                    && typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TSubEntity))
+                    && store is IQueryableEntityStore<TEntity, TSubEntity>)
+                {
+                    return await ((IQueryableEntityStore<TEntity, TSubEntity>)store).SubEntities
+                        .SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken) as T;
+                }
+                else
+                {
+                    return await directFindSubEntityByIdAsync(key) as T;
+                }
             }
-            return Task.FromResult(ConvertIdToString(id));
+
+            throw new InvalidOperationException(string.Format(Resources.EntityTypeOrSubEntityTypeNotSupported, nameof(T), nameof(TEntity), nameof(TSubEntity)));
         }
     }
 
@@ -166,54 +192,137 @@ namespace PhantomNet.Entities.EntityFramework
             return EntityResult.Success;
         }
 
-        public static Task<string> GetEntityIdAsync<TEntity, TContext, TKey>(
+        public static Task<T> FindEntityByIdAsync<TEntity, TContext, TKey, T>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
-            TEntity entity, CancellationToken cancellationToken)
+            string id, CancellationToken cancellationToken)
             where TEntity : class, IIdWiseEntity<TKey>
             where TContext : DbContext
             where TKey : IEquatable<TKey>
+            where T : class
         {
-            return GetEntityIdAsync(store, entity, cancellationToken, null);
+            return FindEntityByIdAsync<TEntity, TContext, TKey, T>(store, id, cancellationToken, null);
         }
 
-        public static Task<string> GetEntityIdAsync<TEntity, TContext, TKey>(
+        public static async Task<T> FindEntityByIdAsync<TEntity, TContext, TKey, T>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
-            TEntity entity, CancellationToken cancellationToken,
-            Func<TKey> directGetId)
+            string id, CancellationToken cancellationToken,
+            Func<TKey, Task<TEntity>> directFindByIdAsync)
+            where TEntity : class
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+            where T : class
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            store.ThrowIfDisposed();
+            if (id == null)
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+            if (typeof(T) != typeof(TEntity))
+            {
+                throw new InvalidOperationException(string.Format(Resources.EntityTypeNotSupported, nameof(T), nameof(TEntity)));
+            }
+
+            var key = ConvertIdFromString<TKey>(id);
+            if (directFindByIdAsync == null && typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity))
+                && store is IQueryableEntityStore<TEntity>)
+            {
+                return await ((IQueryableEntityStore<TEntity>)store).Entities
+                    .SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken) as T;
+            }
+            else
+            {
+                return await directFindByIdAsync(key) as T;
+            }
+        }
+
+        public static IQueryable<TEntity> FilterEntities<TEntity, TContext, TKey>(
+            this IEntityStoreMarker<TEntity, TContext, TKey> store,
+            IQueryable<TEntity> query, string filter,
+            Func<IQueryable<TEntity>> directFilter)
+            where TEntity : class
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            return directFilter();
+        }
+
+        public static IQueryable<TEntity> PreSortEntities<TEntity, TContext, TKey>(
+            this IEntityStoreMarker<TEntity, TContext, TKey> store,
+            IQueryable<TEntity> query,
+            Func<IQueryable<TEntity>> directPreSort)
+            where TEntity : class
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            return directPreSort();
+        }
+
+        public static IQueryable<TEntity> DefaultSortEntities<TEntity, TContext, TKey>(
+            this IEntityStoreMarker<TEntity, TContext, TKey> store,
+            IQueryable<TEntity> query,
+            Func<IQueryable<TEntity>> directDefaultSort,
+            Func<IOrderedQueryable<TEntity>, IQueryable<TEntity>> directOrderedDefaultSort)
+            where TEntity : class
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            if (query.Expression.Type == typeof(IOrderedQueryable<TEntity>))
+            {
+                return directOrderedDefaultSort((IOrderedQueryable<TEntity>)query);
+            }
+            else
+            {
+                return directDefaultSort();
+            }
+        }
+
+        public static Task<int> CountEntitiesAsync<TEntity, TContext, TKey>(
+            this IEntityStoreMarker<TEntity, TContext, TKey> store,
+            IQueryable<TEntity> entities, CancellationToken cancellationToken)
             where TEntity : class
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
             cancellationToken.ThrowIfCancellationRequested();
             store.ThrowIfDisposed();
-            if (entity == null)
+            if (entities == null)
             {
-                throw new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException(nameof(entities));
             }
 
-            TKey id;
-            if (directGetId == null && entity is IIdWiseEntity<TKey>)
-            {
-                id = ((IIdWiseEntity<TKey>)entity).Id;
-            }
-            else
-            {
-                id = directGetId();
-            }
-            return Task.FromResult(ConvertIdToString(id));
+            return entities.CountAsync(cancellationToken);
         }
 
         #region Helpers
 
-        private static string ConvertIdToString<TKey>(TKey id)
+        private static TKey ConvertIdFromString<TKey>(string id)
             where TKey : IEquatable<TKey>
         {
-            if (id.Equals(default(TKey)))
+            if (id == null)
             {
-                return null;
+                return default(TKey);
             }
 
-            return id.ToString();
+            return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString(id);
         }
 
         #endregion

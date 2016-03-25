@@ -120,6 +120,9 @@
   <data name="ConcurrencyFailure" xml:space="preserve">
     <value>Optimistic concurrency failure, object has been modified.</value>
   </data>
+  <data name="DefaultError" xml:space="preserve">
+    <value>An unknown failure has occured.</value>
+  </data>
   <data name="GenericClassNotMatched" xml:space="preserve">
     <value>Generic class {0} must also be used as class parameter.</value>
   </data>
@@ -149,15 +152,6 @@
   </data>
   <data name="StoreNotIQueryableEntityWithSubEntityStore" xml:space="preserve">
     <value>Store does not implement IQueryableEntityStore&lt;TEntity, TSubEntity&gt;.</value>
-  </data>
-  <data name="StoreNotIReadOnlyCodeBasedEntityStore" xml:space="preserve">
-    <value>Store does not implement IReadOnlyCodeBasedEntityStore&lt;TEntity&gt;.</value>
-  </data>
-  <data name="StoreNotIReadOnlyEntityStore" xml:space="preserve">
-    <value>Store does not implement IReadOnlyEntityStore&lt;TEntity&gt;.</value>
-  </data>
-  <data name="StoreNotIReadOnlyEntityWithSubEntityStore" xml:space="preserve">
-    <value>Store does not implement IReadOnlyEntityStore&lt;TEntity, TSubEntity&gt;.</value>
   </data>
   <data name="StoreNotIScopedNameBasedEntityStore" xml:space="preserve">
     <value>Store does not implement IScopedNameBasedEntityStore&lt;TEntity, TEntityScope&gt;.</value>
