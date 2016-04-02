@@ -9,7 +9,8 @@ namespace PhantomNet.Entities
         public static string GetEntityCode<TEntity>(
             this ICodeBasedEntityAccessor<TEntity> accessor,
             TEntity entity)
-            where TEntity : class
+            where TEntity : class,
+                            ICodeWiseEntity
         {
             return GetEntityCode(accessor, entity, null, null);
         }
@@ -47,7 +48,8 @@ namespace PhantomNet.Entities
         public static void SetEntityCode<TEntity>(
             this ICodeBasedEntityAccessor<TEntity> accessor,
             TEntity entity, string code)
-            where TEntity : class
+            where TEntity : class,
+                            ICodeWiseEntity
         {
             SetEntityCode(accessor, entity, code, null, null);
         }

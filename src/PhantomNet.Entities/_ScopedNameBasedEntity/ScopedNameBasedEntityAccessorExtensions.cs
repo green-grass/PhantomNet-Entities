@@ -9,7 +9,8 @@ namespace PhantomNet.Entities
         public static string GetEntityName<TEntity, TEntityScope>(
             this IScopedNameBasedEntityAccessor<TEntity, TEntityScope> accessor,
             TEntity entity)
-            where TEntity : class
+            where TEntity : class,
+                            INameWiseEntity
             where TEntityScope : class
         {
             return GetEntityName(accessor, entity, null, null);
@@ -49,7 +50,8 @@ namespace PhantomNet.Entities
         public static void SetEntityName<TEntity, TEntityScope>(
             this IScopedNameBasedEntityAccessor<TEntity, TEntityScope> accessor,
             TEntity entity, string name)
-            where TEntity : class
+            where TEntity : class,
+                            INameWiseEntity
             where TEntityScope : class
         {
             SetEntityName(accessor, entity, name, null, null);
@@ -91,7 +93,8 @@ namespace PhantomNet.Entities
         public static void SetEntityNormalizedName<TEntity, TEntityScope>(
             this IScopedNameBasedEntityAccessor<TEntity, TEntityScope> accessor,
             TEntity entity, string name)
-            where TEntity : class
+            where TEntity : class,
+                            INameWiseEntity
             where TEntityScope : class
         {
             SetEntityNormalizedName(accessor, entity, name, null, null);
@@ -132,15 +135,6 @@ namespace PhantomNet.Entities
 
         public static TEntityScope GetEntityScope<TEntity, TEntityScope>(
             this IScopedNameBasedEntityAccessor<TEntity, TEntityScope> accessor,
-            TEntity entity)
-            where TEntity : class
-            where TEntityScope : class
-        {
-            return GetEntityScope(accessor, entity, null, null);
-        }
-
-        public static TEntityScope GetEntityScope<TEntity, TEntityScope>(
-            this IScopedNameBasedEntityAccessor<TEntity, TEntityScope> accessor,
             TEntity entity,
             Expression<Func<TEntity, TEntityScope>> scopeSelector,
             Func<TEntityScope> directGetScope)
@@ -162,16 +156,6 @@ namespace PhantomNet.Entities
             }
 
             throw new ArgumentNullException($"{nameof(scopeSelector)}, {nameof(directGetScope)}");
-        }
-
-        public static void SetEntityScope<TEntity, TEntityScope, TKey>(
-            this IScopedNameBasedEntityAccessor<TEntity, TEntityScope> accessor,
-            TEntity entity, TEntityScope scope)
-            where TEntity : class
-            where TEntityScope : class
-            where TKey : IEquatable<TKey>
-        {
-            SetEntityScope<TEntity, TEntityScope, TKey>(accessor, entity, scope, null, null, null);
         }
 
         public static void SetEntityScope<TEntity, TEntityScope, TKey>(

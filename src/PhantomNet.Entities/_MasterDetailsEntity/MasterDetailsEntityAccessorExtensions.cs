@@ -10,7 +10,8 @@ namespace PhantomNet.Entities
         public static ICollection<TEntityDetail> GetEntityDetails<TEntity, TEntityDetail>(
             this IMasterDetailsEntityAccessor<TEntity, TEntityDetail> accessor,
             TEntity entity)
-            where TEntity : class
+            where TEntity : class,
+                            IDetailsWiseEntity<TEntityDetail>
             where TEntityDetail : class
         {
             return GetEntityDetails(accessor, entity, null, null);
