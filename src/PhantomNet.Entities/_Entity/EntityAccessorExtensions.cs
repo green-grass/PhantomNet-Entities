@@ -10,7 +10,7 @@ namespace PhantomNet.Entities
             this IEntityAccessor<TEntity, TSubEntity> accessor,
             TSubEntity subEntity)
             where TEntity : class
-            where TSubEntity : class
+            where TSubEntity : class, IIdWiseEntity<TKey>
             where TKey : IEquatable<TKey>
         {
             return GetEntityId<TEntity, TSubEntity, TKey>(accessor, subEntity, null, null);
@@ -51,8 +51,7 @@ namespace PhantomNet.Entities
         public static string GetEntityId<TEntity, TKey>(
             this IEntityAccessor<TEntity> accessor,
             TEntity entity)
-            where TEntity : class,
-                            IIdWiseEntity<TKey>
+            where TEntity : class, IIdWiseEntity<TKey>
             where TKey : IEquatable<TKey>
         {
             return GetEntityId<TEntity, TKey>(accessor, entity, null, null);

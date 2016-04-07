@@ -12,15 +12,15 @@ namespace PhantomNet.Entities
                                ITimeTrackedEntityManager<TEntity>,
                                ICodeBasedEntityManager<TEntity>
     {
-        public IncrementalCodeGenerator(ICodeBasedEntityAccessor<TEntity> entityAccessor, IOptions<IncrementalCodeGeneratorOptions> optionsAccessor)
+        public IncrementalCodeGenerator(ICodeBasedEntityAccessor<TEntity> entityCodeAccessor, IOptions<IncrementalCodeGeneratorOptions> optionsAccessor)
         {
-            EntityAccessor = entityAccessor;
+            EntityCodeAccessor = entityCodeAccessor;
             Prefixes = optionsAccessor?.Value?.Prefixes ?? new Dictionary<Type, string>();
         }
 
         public IDictionary<Type, string> Prefixes { get; }
 
-        protected ICodeBasedEntityAccessor<TEntity> EntityAccessor { get; }
+        protected ICodeBasedEntityAccessor<TEntity> EntityCodeAccessor { get; }
 
         public async Task<string> GenerateCodeAsync(TEntityManager manager, TEntity entity, CancellationToken cancellationToken)
         {
@@ -33,7 +33,7 @@ namespace PhantomNet.Entities
                 return $"{prefix}1";
             }
 
-            var latestCode = EntityAccessor.GetCode(latestEntity);
+            var latestCode = EntityCodeAccessor.GetCode(latestEntity);
             var latestNumber = int.Parse(latestCode.Substring(prefix.Length));
             return $"{prefix}{latestNumber + 1}";
         }

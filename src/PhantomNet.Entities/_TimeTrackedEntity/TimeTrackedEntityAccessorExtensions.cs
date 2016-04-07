@@ -9,8 +9,7 @@ namespace PhantomNet.Entities
         public static void SetEntityDataCreateDate<TEntity>(
             this ITimeTrackedEntityAccessor<TEntity> accessor,
             TEntity entity, DateTime dataCreateDate)
-            where TEntity : class,
-                            ITimeWiseEntity
+            where TEntity : class, ITimeWiseEntity
         {
             SetEntityDataCreateDate(accessor, entity, dataCreateDate, null, null);
         }
@@ -50,8 +49,7 @@ namespace PhantomNet.Entities
         public static void SetEntityDataLastModifyDate<TEntity>(
             this ITimeTrackedEntityAccessor<TEntity> accessor,
             TEntity entity, DateTime dataLastModifyDate)
-            where TEntity : class,
-                            ITimeWiseEntity
+            where TEntity : class, ITimeWiseEntity
         {
             SetEntityDataLastModifyDate(accessor, entity, dataLastModifyDate, null, null);
         }

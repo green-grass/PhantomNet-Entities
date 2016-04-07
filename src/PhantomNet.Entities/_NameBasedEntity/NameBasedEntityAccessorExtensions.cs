@@ -9,8 +9,7 @@ namespace PhantomNet.Entities
         public static string GetEntityName<TEntity>(
             this INameBasedEntityAccessor<TEntity> accessor,
             TEntity entity)
-            where TEntity : class,
-                            INameWiseEntity
+            where TEntity : class, INameWiseEntity
         {
             return GetEntityName(accessor, entity, null, null);
         }
@@ -48,8 +47,7 @@ namespace PhantomNet.Entities
         public static void SetEntityName<TEntity>(
             this INameBasedEntityAccessor<TEntity> accessor,
             TEntity entity, string name)
-            where TEntity : class,
-                            INameWiseEntity
+            where TEntity : class, INameWiseEntity
         {
             SetEntityName(accessor, entity, name, null, null);
         }
@@ -88,8 +86,7 @@ namespace PhantomNet.Entities
         public static void SetEntityNormalizedName<TEntity>(
             this INameBasedEntityAccessor<TEntity> accessor,
             TEntity entity, string name)
-            where TEntity : class,
-                            INameWiseEntity
+            where TEntity : class, INameWiseEntity
         {
             SetEntityNormalizedName(accessor, entity, name, null, null);
         }
