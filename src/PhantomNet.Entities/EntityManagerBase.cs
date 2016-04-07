@@ -530,6 +530,7 @@ namespace PhantomNet.Entities
                 TimeTrackedEntityAccessor.SetDataCreateDate(entity, date);
                 TimeTrackedEntityAccessor.SetDataLastModifyDate(entity, date);
             }
+
             await Task.FromResult(0);
         }
 
@@ -549,6 +550,7 @@ namespace PhantomNet.Entities
             {
                 TimeTrackedEntityAccessor.SetDataLastModifyDate(entity, DateTime.Now);
             }
+
             await Task.FromResult(0);
         }
 
