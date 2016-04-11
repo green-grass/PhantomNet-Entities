@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
@@ -19,28 +20,47 @@ namespace PhantomNet.Entities.EntityFramework
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindLatestEntityAsync(store, cancellationToken, null);
+            return FindLatestEntityInternalAsync(store, null, cancellationToken);
         }
 
         public static Task<TEntity> FindLatestEntityAsync<TEntity, TContext, TKey>(
             this ITimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
-            CancellationToken cancellationToken,
-            Func<Task<TEntity>> directFindLatestAsync)
+            Expression<Func<TEntity, string>> dataCreateDateSelector,
+            CancellationToken cancellationToken)
+            where TEntity : class
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            if (dataCreateDateSelector == null)
+            {
+                throw new ArgumentNullException(nameof(dataCreateDateSelector));
+            }
+
+            return FindLatestEntityInternalAsync(store, dataCreateDateSelector, cancellationToken);
+        }
+
+        private static Task<TEntity> FindLatestEntityInternalAsync<TEntity, TContext, TKey>(
+            ITimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
+            Expression<Func<TEntity, string>> dataCreateDateSelector,
+            CancellationToken cancellationToken)
             where TEntity : class
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
             cancellationToken.ThrowIfCancellationRequested();
             store.ThrowIfDisposed();
-            if (directFindLatestAsync == null && typeof(ITimeWiseEntity).IsAssignableFrom(typeof(TEntity))
-                && store is IQueryableEntityStore<TEntity>)
+
+            if (dataCreateDateSelector != null)
             {
-                return ((IQueryableEntityStore<TEntity>)store).Entities.OrderByDescending(x => ((ITimeWiseEntity)x).DataCreateDate).FirstOrDefaultAsync(cancellationToken);
+                return store.Entities.OrderByDescending(x => dataCreateDateSelector.Compile().Invoke(x)).FirstOrDefaultAsync(cancellationToken);
             }
-            else
+
+            if (typeof(ITimeWiseEntity).IsAssignableFrom(typeof(TEntity)))
             {
-                return directFindLatestAsync();
+                return store.Entities.OrderByDescending(x => ((ITimeWiseEntity)x).DataCreateDate).FirstOrDefaultAsync(cancellationToken);
             }
+
+            throw new InvalidOperationException();
         }
     }
 }

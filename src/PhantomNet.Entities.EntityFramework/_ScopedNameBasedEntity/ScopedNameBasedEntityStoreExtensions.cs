@@ -14,21 +14,42 @@ namespace PhantomNet.Entities.EntityFramework
     {
         public static Task<TEntity> FindEntityByNameAsync<TEntity, TEntityScope, TContext, TKey>(
             this IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
-            string normalizedName, TEntityScope scope, CancellationToken cancellationToken,
-            Expression<Func<TEntity, TKey>> scopeIdSelector)
-            where TEntity : class, INameWiseEntity
+            string normalizedName, TEntityScope scope,
+            Expression<Func<TEntity, TKey>> scopeIdSelector,
+            CancellationToken cancellationToken)
+            where TEntity : class
             where TEntityScope : class, IIdWiseEntity<TKey>
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindEntityByNameAsync(store, normalizedName, scope, cancellationToken, scopeIdSelector, null);
+            return FindEntityByNameInternalAsync(store, normalizedName, scope, scopeIdSelector, null, cancellationToken);
         }
 
         public static Task<TEntity> FindEntityByNameAsync<TEntity, TEntityScope, TContext, TKey>(
             this IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
-            string normalizedName, TEntityScope scope, CancellationToken cancellationToken,
+            string normalizedName, TEntityScope scope,
             Expression<Func<TEntity, TKey>> scopeIdSelector,
-            Func<Task<TEntity>> directFindByNameAsync)
+            Expression<Func<TEntityScope, TKey>> idSelector,
+            CancellationToken cancellationToken)
+            where TEntity : class
+            where TEntityScope : class, IIdWiseEntity<TKey>
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            if (idSelector == null)
+            {
+                throw new ArgumentNullException(nameof(idSelector));
+            }
+
+            return FindEntityByNameInternalAsync(store, normalizedName, scope, scopeIdSelector, idSelector, cancellationToken);
+        }
+
+        public static Task<TEntity> FindEntityByNameInternalAsync<TEntity, TEntityScope, TContext, TKey>(
+            IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
+            string normalizedName, TEntityScope scope,
+            Expression<Func<TEntity, TKey>> scopeIdSelector,
+            Expression<Func<TEntityScope, TKey>> idSelector,
+            CancellationToken cancellationToken)
             where TEntity : class
             where TEntityScope : class
             where TContext : DbContext
@@ -44,26 +65,33 @@ namespace PhantomNet.Entities.EntityFramework
             {
                 throw new ArgumentNullException(nameof(scope));
             }
-
-            if (directFindByNameAsync == null && scopeIdSelector != null
-                && typeof(INameWiseEntity).IsAssignableFrom(typeof(TEntity))
-                && scope is IIdWiseEntity<TKey>
-                && store is IQueryableEntityStore<TEntity>)
+            if (scopeIdSelector == null)
             {
-                var scopeId = ((IIdWiseEntity<TKey>)scope).Id;
-                var param = Expression.Parameter(typeof(TEntity), "x");
-                var scopeIdMember = Expression.Property(param, scopeIdSelector.GetPropertyAccess().Name);
-                var scopeIdExpression = Expression.Equal(scopeIdMember, Expression.Constant(scopeId, typeof(TKey)));
-                var normalizedNameMember = Expression.Property(param, nameof(INameWiseEntity.NormalizedName));
-                var normalizedNameExpression = Expression.Equal(normalizedNameMember, Expression.Constant(normalizedName));
-                var expression = Expression.AndAlso(scopeIdExpression, normalizedNameExpression);
-                var predicate = Expression.Lambda<Func<TEntity, bool>>(expression, param);
-                return ((IQueryableEntityStore<TEntity>)store).Entities.SingleOrDefaultAsync(predicate, cancellationToken);
+                throw new ArgumentNullException(nameof(scopeIdSelector));
+            }
+
+            TKey scopeId;
+            if (idSelector != null)
+            {
+                scopeId = idSelector.Compile().Invoke(scope);
+            }
+            else if (scope is IIdWiseEntity<TKey>)
+            {
+                scopeId = ((IIdWiseEntity<TKey>)scope).Id;
             }
             else
             {
-                return directFindByNameAsync();
+                throw new InvalidOperationException();
             }
+
+            var param = Expression.Parameter(typeof(TEntity), "x");
+            var scopeIdMember = Expression.Property(param, scopeIdSelector.GetPropertyAccess().Name);
+            var scopeIdExpression = Expression.Equal(scopeIdMember, Expression.Constant(scopeId, typeof(TKey)));
+            var normalizedNameMember = Expression.Property(param, nameof(INameWiseEntity.NormalizedName));
+            var normalizedNameExpression = Expression.Equal(normalizedNameMember, Expression.Constant(normalizedName));
+            var expression = Expression.AndAlso(scopeIdExpression, normalizedNameExpression);
+            var predicate = Expression.Lambda<Func<TEntity, bool>>(expression, param);
+            return store.Entities.SingleOrDefaultAsync(predicate, cancellationToken);
         }
     }
 }

@@ -840,6 +840,48 @@ namespace PhantomNet.Entities
         #endregion
     }
 
+    // ActivatableEntity
+    partial class EntityManagerBase<TEntity, TEntityManager>
+    {
+        #region Properties
+
+        protected virtual bool SupportsActivatableEntity
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return Store is IActivatableEntityStore<TEntity>;
+            }
+        }
+
+        protected virtual IActivatableEntityStore<TEntity> ActivatableEntityStore
+        {
+            get
+            {
+                ThrowIfDisposed();
+                var store = Store as IActivatableEntityStore<TEntity>;
+                if (store == null)
+                {
+                    throw new NotSupportedException(Resources.StoreNotIActivatableEntityStore);
+                }
+
+                return store;
+            }
+        }
+
+        #endregion
+
+        #region Public Operations
+
+        protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(bool? isActive, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
+        {
+            ThrowIfDisposed();
+            return SearchEntitiesInternalAsync(ActivatableEntityStore.FilterByIsActive(Entities, isActive), search, pageNumber, pageSize, sort, reverse);
+        }
+
+        #endregion
+    }
+
     // TimeTrackedEntity
     partial class EntityManagerBase<TEntity, TEntityManager>
     {

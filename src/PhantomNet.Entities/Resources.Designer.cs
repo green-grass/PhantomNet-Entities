@@ -87,6 +87,15 @@ namespace PhantomNet.Entities {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to Store does not implement IActivatableEntityStore&lt;TEntity&gt;..
+        /// </summary>
+        internal static string StoreNotIActivatableEntityStore {
+            get {
+                return ResourceManager.GetString("StoreNotIActivatableEntityStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;..
         /// </summary>
         internal static string StoreNotICodeBasedEntityStore {
