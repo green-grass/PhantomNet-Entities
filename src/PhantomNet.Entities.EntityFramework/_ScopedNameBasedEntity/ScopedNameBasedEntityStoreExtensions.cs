@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,10 +11,10 @@ using System.Reflection;
 
 namespace PhantomNet.Entities.EntityFramework
 {
-    public static class ScopedNameBasedEntityStoreExtensions
+    public static class QueryableScopedNameBasedEntityStoreExtensions
     {
         public static Task<TEntity> FindEntityByNameAsync<TEntity, TEntityScope, TContext, TKey>(
-            this IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
+            this IQueryableScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
             string normalizedName, TEntityScope scope,
             Expression<Func<TEntity, TKey>> scopeIdSelector,
             CancellationToken cancellationToken)
@@ -22,11 +23,45 @@ namespace PhantomNet.Entities.EntityFramework
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindEntityByNameInternalAsync(store, normalizedName, scope, scopeIdSelector, null, cancellationToken);
+            store.ThrowIfDisposed();
+            return store.FindEntityByNameAsync(store.Entities, normalizedName, scope, scopeIdSelector, cancellationToken);
+        }
+
+        public static Task<TEntity> FindEntityByNameAsync<TEntity, TEntityScope, TContext, TKey>(
+            this IQueryableScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
+            string normalizedName, TEntityScope scope,
+            Expression<Func<TEntity, TKey>> scopeIdSelector,
+            Expression<Func<TEntityScope, TKey>> idSelector,
+            CancellationToken cancellationToken)
+            where TEntity : class
+            where TEntityScope : class, IIdWiseEntity<TKey>
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            store.ThrowIfDisposed();
+            return store.FindEntityByNameAsync(store.Entities, normalizedName, scope, scopeIdSelector, idSelector, cancellationToken);
+        }
+    }
+
+    public static class ScopedNameBasedEntityStoreExtensions
+    {
+        public static Task<TEntity> FindEntityByNameAsync<TEntity, TEntityScope, TContext, TKey>(
+            this IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
+            IQueryable<TEntity> entities,
+            string normalizedName, TEntityScope scope,
+            Expression<Func<TEntity, TKey>> scopeIdSelector,
+            CancellationToken cancellationToken)
+            where TEntity : class
+            where TEntityScope : class, IIdWiseEntity<TKey>
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            return FindEntityByNameInternalAsync(entities, normalizedName, scope, scopeIdSelector, null, cancellationToken);
         }
 
         public static Task<TEntity> FindEntityByNameAsync<TEntity, TEntityScope, TContext, TKey>(
             this IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
+            IQueryable<TEntity> entities,
             string normalizedName, TEntityScope scope,
             Expression<Func<TEntity, TKey>> scopeIdSelector,
             Expression<Func<TEntityScope, TKey>> idSelector,
@@ -41,22 +76,20 @@ namespace PhantomNet.Entities.EntityFramework
                 throw new ArgumentNullException(nameof(idSelector));
             }
 
-            return FindEntityByNameInternalAsync(store, normalizedName, scope, scopeIdSelector, idSelector, cancellationToken);
+            return FindEntityByNameInternalAsync(entities, normalizedName, scope, scopeIdSelector, idSelector, cancellationToken);
         }
 
-        public static Task<TEntity> FindEntityByNameInternalAsync<TEntity, TEntityScope, TContext, TKey>(
-            IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey> store,
+        public static Task<TEntity> FindEntityByNameInternalAsync<TEntity, TEntityScope, TKey>(
+            IQueryable<TEntity> entities,
             string normalizedName, TEntityScope scope,
             Expression<Func<TEntity, TKey>> scopeIdSelector,
             Expression<Func<TEntityScope, TKey>> idSelector,
             CancellationToken cancellationToken)
             where TEntity : class
             where TEntityScope : class
-            where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            store.ThrowIfDisposed();
             if (normalizedName == null)
             {
                 throw new ArgumentNullException(nameof(normalizedName));
@@ -91,7 +124,7 @@ namespace PhantomNet.Entities.EntityFramework
             var normalizedNameExpression = Expression.Equal(normalizedNameMember, Expression.Constant(normalizedName));
             var expression = Expression.AndAlso(scopeIdExpression, normalizedNameExpression);
             var predicate = Expression.Lambda<Func<TEntity, bool>>(expression, param);
-            return store.Entities.SingleOrDefaultAsync(predicate, cancellationToken);
+            return entities.SingleOrDefaultAsync(predicate, cancellationToken);
         }
     }
 }

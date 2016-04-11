@@ -11,20 +11,48 @@ using System.Reflection;
 
 namespace PhantomNet.Entities.EntityFramework
 {
-    public static class TimeTrackedEntityStoreExtensions
+    public static class QueryableTimeTrackedEntityStoreExtensions
     {
         public static Task<TEntity> FindLatestEntityAsync<TEntity, TContext, TKey>(
-            this ITimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
+            this IQueryableTimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
             CancellationToken cancellationToken)
             where TEntity : class, ITimeWiseEntity
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindLatestEntityInternalAsync(store, null, cancellationToken);
+            store.ThrowIfDisposed();
+            return store.FindLatestEntityAsync(store.Entities, cancellationToken);
+        }
+
+        public static Task<TEntity> FindLatestEntityAsync<TEntity, TContext, TKey>(
+            this IQueryableTimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
+            Expression<Func<TEntity, string>> dataCreateDateSelector,
+            CancellationToken cancellationToken)
+            where TEntity : class
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            store.ThrowIfDisposed();
+            return store.FindLatestEntityAsync(store.Entities, dataCreateDateSelector, cancellationToken);
+        }
+    }
+
+    public static class TimeTrackedEntityStoreExtensions
+    {
+        public static Task<TEntity> FindLatestEntityAsync<TEntity, TContext, TKey>(
+            this ITimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
+            IQueryable<TEntity> entities,
+            CancellationToken cancellationToken)
+            where TEntity : class, ITimeWiseEntity
+            where TContext : DbContext
+            where TKey : IEquatable<TKey>
+        {
+            return FindLatestEntityInternalAsync(entities, null, cancellationToken);
         }
 
         public static Task<TEntity> FindLatestEntityAsync<TEntity, TContext, TKey>(
             this ITimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
+            IQueryable<TEntity> entities,
             Expression<Func<TEntity, string>> dataCreateDateSelector,
             CancellationToken cancellationToken)
             where TEntity : class
@@ -36,28 +64,25 @@ namespace PhantomNet.Entities.EntityFramework
                 throw new ArgumentNullException(nameof(dataCreateDateSelector));
             }
 
-            return FindLatestEntityInternalAsync(store, dataCreateDateSelector, cancellationToken);
+            return FindLatestEntityInternalAsync(entities, dataCreateDateSelector, cancellationToken);
         }
 
-        private static Task<TEntity> FindLatestEntityInternalAsync<TEntity, TContext, TKey>(
-            ITimeTrackedEntityStoreMarker<TEntity, TContext, TKey> store,
+        private static Task<TEntity> FindLatestEntityInternalAsync<TEntity>(
+            IQueryable<TEntity> entities,
             Expression<Func<TEntity, string>> dataCreateDateSelector,
             CancellationToken cancellationToken)
             where TEntity : class
-            where TContext : DbContext
-            where TKey : IEquatable<TKey>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            store.ThrowIfDisposed();
 
             if (dataCreateDateSelector != null)
             {
-                return store.Entities.OrderByDescending(x => dataCreateDateSelector.Compile().Invoke(x)).FirstOrDefaultAsync(cancellationToken);
+                return entities.OrderByDescending(x => dataCreateDateSelector.Compile().Invoke(x)).FirstOrDefaultAsync(cancellationToken);
             }
 
             if (typeof(ITimeWiseEntity).IsAssignableFrom(typeof(TEntity)))
             {
-                return store.Entities.OrderByDescending(x => ((ITimeWiseEntity)x).DataCreateDate).FirstOrDefaultAsync(cancellationToken);
+                return entities.OrderByDescending(x => ((ITimeWiseEntity)x).DataCreateDate).FirstOrDefaultAsync(cancellationToken);
             }
 
             throw new InvalidOperationException();

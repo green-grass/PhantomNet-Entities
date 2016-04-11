@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace PhantomNet.Entities.EntityFramework
 {
-    public static class EntityFrameworkActivatableEntityStoreExtensions
+    public static class ActivatableEntityStoreExtensions
     {
         public static IQueryable<TEntity> FilterEntitiesByIsActive<TEntity, TContext, TKey>(
             this IActivatableEntityStoreMarker<TEntity, TContext, TKey> store,

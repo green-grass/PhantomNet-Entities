@@ -313,12 +313,7 @@ namespace PhantomNet.Entities
             }
 
             var entity = await ScopedNameBasedStore.FindByNameAsync(NormalizeEntityKey(name), scope, CancellationToken);
-
-            if (entity != null && SupportsEagerLoadingEntity)
-            {
-                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
-            }
-
+            await TryEeagerLoadingEntity(entity);
             return entity;
         }
 
@@ -573,6 +568,26 @@ namespace PhantomNet.Entities
             return EntityResult.Success;
         }
 
+        protected virtual async Task TryEeagerLoadingEntities(IEnumerable<TEntity> entities)
+        {
+            if (SupportsEagerLoadingEntity)
+            {
+                // Loading all entities parallelly will throw AggregateException exception.
+                foreach (var entity in entities)
+                {
+                    await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
+                }
+            }
+        }
+
+        protected virtual async Task TryEeagerLoadingEntity(TEntity entity)
+        {
+            if (entity != null && SupportsEagerLoadingEntity)
+            {
+                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
+            }
+        }
+
         #endregion
 
         #region IDisposable Support
@@ -713,12 +728,7 @@ namespace PhantomNet.Entities
             }
 
             var entity = await EntityStore.FindByIdAsync<TEntity>(id, CancellationToken);
-
-            if (entity != null && SupportsEagerLoadingEntity)
-            {
-                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
-            }
-
+            await TryEeagerLoadingEntity(entity);
             return entity;
         }
 
@@ -792,16 +802,7 @@ namespace PhantomNet.Entities
             }
 
             result.Results = models.Skip(offset).Take(limit);
-
-            if (SupportsEagerLoadingEntity)
-            {
-                // Loading all entities parallelly will throw AggregateException exception.
-                foreach (var entity in result.Results)
-                {
-                    await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
-                }
-            }
-
+            await TryEeagerLoadingEntities(result.Results);
             return result;
         }
 
@@ -934,12 +935,7 @@ namespace PhantomNet.Entities
         {
             ThrowIfDisposed();
             var entity = await TimeTrackedEntityStore.FindLatestAsync(CancellationToken);
-
-            if (entity != null && SupportsEagerLoadingEntity)
-            {
-                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
-            }
-
+            await TryEeagerLoadingEntity(entity);
             return entity;
         }
 
@@ -1003,12 +999,7 @@ namespace PhantomNet.Entities
             }
 
             var entity = await CodeBasedEntityStore.FindByCodeAsync(NormalizeEntityKey(code), CancellationToken);
-
-            if (entity != null && SupportsEagerLoadingEntity)
-            {
-                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
-            }
-
+            await TryEeagerLoadingEntity(entity);
             return entity;
         }
 
@@ -1092,12 +1083,7 @@ namespace PhantomNet.Entities
             }
 
             var entity = await NameBasedEntityStore.FindByNameAsync(NormalizeEntityKey(name), CancellationToken);
-
-            if (entity != null && SupportsEagerLoadingEntity)
-            {
-                await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
-            }
-
+            await TryEeagerLoadingEntity(entity);
             return entity;
         }
 
