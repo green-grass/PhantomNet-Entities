@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
 
@@ -11,6 +12,11 @@ namespace PhantomNet.Entities
     {
         public UrlFriendlyCodeGenerator(INameBasedEntityAccessor<TEntity> entityNameAccessor, IOptions<UrlFriendlyCodeGeneratorOptions> optionsAccessor)
         {
+            if (entityNameAccessor == null)
+            {
+                throw new ArgumentNullException(nameof(entityNameAccessor));
+            }
+
             EntityNameAccessor = entityNameAccessor;
         }
 

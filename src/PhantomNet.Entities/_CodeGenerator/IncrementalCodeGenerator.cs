@@ -14,6 +14,11 @@ namespace PhantomNet.Entities
     {
         public IncrementalCodeGenerator(ICodeBasedEntityAccessor<TEntity> entityCodeAccessor, IOptions<IncrementalCodeGeneratorOptions> optionsAccessor)
         {
+            if (entityCodeAccessor == null)
+            {
+                throw new ArgumentNullException(nameof(entityCodeAccessor));
+            }
+
             EntityCodeAccessor = entityCodeAccessor;
             Prefixes = optionsAccessor?.Value?.Prefixes ?? new Dictionary<Type, string>();
         }
