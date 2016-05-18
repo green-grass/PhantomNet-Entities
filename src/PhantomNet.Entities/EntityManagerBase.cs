@@ -12,8 +12,8 @@ using System.Reflection;
 namespace PhantomNet.Entities
 {
     // Foundation
-    public abstract partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager> :
-        EntityManagerBase<TEntity, TEntityManager>
+    public abstract partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
+        : EntityManagerBase<TEntity, TEntityManager>
         where TEntity : class
         where TSubEntity : class
         where TEntityManager : EntityManagerBase<TEntity, TSubEntity, TEntityManager>

@@ -2,8 +2,8 @@
 
 namespace PhantomNet.Entities
 {
-    public interface IEntityValidator<in TEntity, in TSubEntity, in TEntityManager> :
-        IEntityValidator<TEntity, TEntityManager>
+    public interface IEntityValidator<in TEntity, in TSubEntity, in TEntityManager>
+        : IEntityValidator<TEntity, TEntityManager>
         where TEntity : class
         where TSubEntity : class
         where TEntityManager : class

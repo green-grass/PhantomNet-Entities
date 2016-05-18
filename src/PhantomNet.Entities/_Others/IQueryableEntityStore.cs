@@ -3,8 +3,8 @@ using System.Linq;
 
 namespace PhantomNet.Entities
 {
-    public interface IQueryableEntityStore<TEntity, TSubEntity> :
-        IQueryableEntityStore<TEntity>
+    public interface IQueryableEntityStore<TEntity, TSubEntity>
+        : IQueryableEntityStore<TEntity>
         where TEntity : class
         where TSubEntity : class
     {

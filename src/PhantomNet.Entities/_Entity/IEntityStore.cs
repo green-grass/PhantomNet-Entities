@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace PhantomNet.Entities
 {
-    public interface IEntityStore<TEntity, TSubEntity> :
-        IEntityStore<TEntity>
+    public interface IEntityStore<TEntity, TSubEntity>
+        : IEntityStore<TEntity>
         where TEntity : class
         where TSubEntity : class
     { }

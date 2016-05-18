@@ -1,7 +1,7 @@
 ﻿namespace PhantomNet.Entities
 {
-    public interface IEntityAccessor<TEntity, TSubEntity> :
-        IEntityAccessor<TEntity>
+    public interface IEntityAccessor<TEntity, TSubEntity>
+        : IEntityAccessor<TEntity>
         where TEntity : class
         where TSubEntity : class
     {

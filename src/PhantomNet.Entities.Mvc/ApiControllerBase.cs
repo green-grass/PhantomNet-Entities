@@ -6,8 +6,8 @@ using Microsoft.AspNet.Mvc;
 namespace PhantomNet.Entities.Mvc
 {
     // Foundation
-    public abstract partial class ApiControllerBase<TModel, TSubModel, TModelManager, TErrorDescriber> :
-        ApiControllerBase<TModel, TModelManager, TErrorDescriber>
+    public abstract partial class ApiControllerBase<TModel, TSubModel, TModelManager, TErrorDescriber>
+        : ApiControllerBase<TModel, TModelManager, TErrorDescriber>
         where TModel : class
         where TSubModel : class
         where TModelManager : IDisposable
