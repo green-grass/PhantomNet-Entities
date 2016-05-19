@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PhantomNet.Entities")]
+[assembly: AssemblyProduct("PhantomNet.Entities.EntityFramework")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -16,4 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("a130e586-507c-4482-91f3-8cd09205b241")]
+[assembly: Guid("165f1f6a-3a85-4180-8371-fb04db1c5cbd")]

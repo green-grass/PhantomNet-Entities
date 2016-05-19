@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PhantomNet.Entities.EntityMarkers
+namespace PhantomNet.Entities
 {
     public interface IIdWiseEntity<TKey>
         where TKey : IEquatable<TKey>

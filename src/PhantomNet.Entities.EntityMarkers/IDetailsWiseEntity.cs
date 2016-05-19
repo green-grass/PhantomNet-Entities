@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PhantomNet.Entities.EntityMarkers
+namespace PhantomNet.Entities
 {
     public interface IDetailsWiseEntity<TEntityDetail>
         where TEntityDetail : class

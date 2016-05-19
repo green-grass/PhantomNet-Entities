@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using PhantomNet.Entities.EntityMarkers;
 
 namespace PhantomNet.Entities
 {

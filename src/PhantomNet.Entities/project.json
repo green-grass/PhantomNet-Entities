@@ -1,38 +1,20 @@
 ﻿{
-  "version": "1.0.2-beta1",
-  "title": "PhantomNet Entities",
-  "description": "PhantomNet.Entities Class Library",
-  "authors": [ "minhnguyen" ],
-  "copyright": "MIT",
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Options": "1.0.0-rc2-final",
+    "NETStandard.Library": "1.5.0-rc2-24027",
+    "PhantomNet.Core": "1.0.0-*",
+    "PhantomNet.Entities.EntityMarkers": "1.0.0-*",
+    "System.Globalization.Extensions": "4.0.1-rc2-24027",
+    "System.Linq.Queryable": "4.0.1-rc2-24027",
+    "System.Reflection.TypeExtensions": "4.1.0-rc2-24027"
+  },
 
   "frameworks": {
-    "net451": {
-      "frameworkAssemblies": {
-        "System.Runtime": "4.0.10.0"
-      }
-    },
-    "dotnet5.4": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516"
-      }
+    "netstandard1.5": {
+      "imports": "dnxcore50"
     }
-  },
-  "dependencies": {
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final",
-    "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
-    "System.Globalization.Extensions": "4.0.1-beta-23516",
-    "System.Linq.Queryable": "4.0.1-beta-23516",
-    "PhantomNet.Core": "1.0.0-*",
-    "PhantomNet.Entities.EntityMarkers": "1.0.2-*"
-  },
-  "namedResource": {
-    "PhantomNet.Entities.Resources": "Resources.resx"
   }
 }

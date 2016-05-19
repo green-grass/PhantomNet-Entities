@@ -2,9 +2,11 @@
   "projects": [
     "src",
     "test",
-    "../PhantomNet-Core/src"
+    "services",
+    "../PhantomNet-Core/src",
+    "../PhantomNet-Core/src/services"
   ],
   "sdk": {
-    "version": "1.0.0-rc1-update1"
+    "version": "1.0.0-preview1-002702"
   }
 }

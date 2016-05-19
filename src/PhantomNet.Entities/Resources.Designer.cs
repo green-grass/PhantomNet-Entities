@@ -22,7 +22,7 @@ namespace PhantomNet.Entities {
     // with the /str option, or rebuild your VS project.
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -35,7 +35,7 @@ namespace PhantomNet.Entities {
         ///    Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PhantomNet.Entities.Resources", typeof(Resources).GetTypeInfo().Assembly);
@@ -50,7 +50,7 @@ namespace PhantomNet.Entities {
         ///    resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -62,7 +62,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Optimistic concurrency failure, object has been modified..
         /// </summary>
-        internal static string ConcurrencyFailure {
+        public static string ConcurrencyFailure {
             get {
                 return ResourceManager.GetString("ConcurrencyFailure", resourceCulture);
             }
@@ -71,7 +71,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to An unknown failure has occured..
         /// </summary>
-        internal static string DefaultError {
+        public static string DefaultError {
             get {
                 return ResourceManager.GetString("DefaultError", resourceCulture);
             }
@@ -80,7 +80,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Generic class {0} must also be used as class parameter..
         /// </summary>
-        internal static string GenericClassNotMatched {
+        public static string GenericClassNotMatched {
             get {
                 return ResourceManager.GetString("GenericClassNotMatched", resourceCulture);
             }
@@ -89,7 +89,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IActivatableEntityStore&lt;TEntity&gt;..
         /// </summary>
-        internal static string StoreNotIActivatableEntityStore {
+        public static string StoreNotIActivatableEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIActivatableEntityStore", resourceCulture);
             }
@@ -98,7 +98,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;..
         /// </summary>
-        internal static string StoreNotICodeBasedEntityStore {
+        public static string StoreNotICodeBasedEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotICodeBasedEntityStore", resourceCulture);
             }
@@ -107,7 +107,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IEagerLoadingEntityStore&lt;TEntity&gt;..
         /// </summary>
-        internal static string StoreNotIEagerLoadingEntityStore {
+        public static string StoreNotIEagerLoadingEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIEagerLoadingEntityStore", resourceCulture);
             }
@@ -116,7 +116,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IEntityStore&lt;TEntity&gt;..
         /// </summary>
-        internal static string StoreNotIEntityStore {
+        public static string StoreNotIEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIEntityStore", resourceCulture);
             }
@@ -125,7 +125,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IEntityStore&lt;TEntity, TSubEntity&gt;..
         /// </summary>
-        internal static string StoreNotIEntityWithSubEntityStore {
+        public static string StoreNotIEntityWithSubEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIEntityWithSubEntityStore", resourceCulture);
             }
@@ -134,7 +134,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IGroupedEntityStore&lt;TEntity, TEntityGroup&gt;..
         /// </summary>
-        internal static string StoreNotIGroupedEntityStore {
+        public static string StoreNotIGroupedEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIGroupedEntityStore", resourceCulture);
             }
@@ -143,7 +143,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IMasterDetailsEntityStore&lt;TEntity, TEntityDetail&gt;..
         /// </summary>
-        internal static string StoreNotIMasterDetailsEntityStore {
+        public static string StoreNotIMasterDetailsEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIMasterDetailsEntityStore", resourceCulture);
             }
@@ -152,7 +152,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement INameBasedEntityStore&lt;TEntity&gt;..
         /// </summary>
-        internal static string StoreNotINameBasedEntityStore {
+        public static string StoreNotINameBasedEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotINameBasedEntityStore", resourceCulture);
             }
@@ -161,7 +161,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IQueryableEntityStore&lt;TEntity&gt;..
         /// </summary>
-        internal static string StoreNotIQueryableEntityStore {
+        public static string StoreNotIQueryableEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIQueryableEntityStore", resourceCulture);
             }
@@ -170,7 +170,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IQueryableEntityStore&lt;TEntity, TSubEntity&gt;..
         /// </summary>
-        internal static string StoreNotIQueryableEntityWithSubEntityStore {
+        public static string StoreNotIQueryableEntityWithSubEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIQueryableEntityWithSubEntityStore", resourceCulture);
             }
@@ -179,7 +179,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement IScopedNameBasedEntityStore&lt;TEntity, TEntityScope&gt;..
         /// </summary>
-        internal static string StoreNotIScopedNameBasedEntityStore {
+        public static string StoreNotIScopedNameBasedEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIScopedNameBasedEntityStore", resourceCulture);
             }
@@ -188,7 +188,7 @@ namespace PhantomNet.Entities {
         /// <summary>
         ///    Looks up a localized string similar to Store does not implement ITimeTrackedEntityStore&lt;TEntity&gt;..
         /// </summary>
-        internal static string StoreNotITimeTrackedEntityStore {
+        public static string StoreNotITimeTrackedEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotITimeTrackedEntityStore", resourceCulture);
             }

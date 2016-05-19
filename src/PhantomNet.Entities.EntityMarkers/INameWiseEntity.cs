@@ -1,4 +1,4 @@
-﻿namespace PhantomNet.Entities.EntityMarkers
+﻿namespace PhantomNet.Entities
 {
     public interface INameWiseEntity
     {
