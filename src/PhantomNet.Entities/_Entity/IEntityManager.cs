@@ -12,11 +12,11 @@ namespace PhantomNet.Entities
     public interface IEntityManager<TEntity> : IDisposable
         where TEntity : class
     {
-        Task<EntityResult> CreateAsync(TEntity entity);
+        Task<GenericResult> CreateAsync(TEntity entity);
 
-        Task<EntityResult> UpdateAsync(TEntity entity);
+        Task<GenericResult> UpdateAsync(TEntity entity);
 
-        Task<EntityResult> DeleteAsync(TEntity entity);
+        Task<GenericResult> DeleteAsync(TEntity entity);
 
         Task<TEntity> FindByIdAsync(string id);
 

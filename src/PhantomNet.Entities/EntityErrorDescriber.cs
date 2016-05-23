@@ -2,9 +2,9 @@
 {
     public class EntityErrorDescriber : ErrorDescriber
     {
-        public virtual EntityError ConcurrencyFailure()
+        public virtual GenericError ConcurrencyFailure()
         {
-            return new EntityError {
+            return new GenericError {
                 Code = nameof(ConcurrencyFailure),
                 Description = Resources.ConcurrencyFailure
             };

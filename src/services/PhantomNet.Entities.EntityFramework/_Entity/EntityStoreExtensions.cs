@@ -186,7 +186,7 @@ namespace PhantomNet.Entities.EntityFramework
     {
         #region Create
 
-        public static async Task<EntityResult> CreateEntityAsync<TEntity, TContext, TKey>(
+        public static async Task<GenericResult> CreateEntityAsync<TEntity, TContext, TKey>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity, CancellationToken cancellationToken)
             where TEntity : class
@@ -204,14 +204,14 @@ namespace PhantomNet.Entities.EntityFramework
 
             await store.SaveChangesAsync(cancellationToken);
 
-            return EntityResult.Success;
+            return GenericResult.Success;
         }
 
         #endregion
 
         #region Update
 
-        public static Task<EntityResult> UpdateEntityAsync<TEntity, TContext, TKey>(
+        public static Task<GenericResult> UpdateEntityAsync<TEntity, TContext, TKey>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity,
             CancellationToken cancellationToken)
@@ -222,10 +222,10 @@ namespace PhantomNet.Entities.EntityFramework
             return UpdateEntityAsync(store, entity, null, cancellationToken);
         }
 
-        public static Task<EntityResult> UpdateEntityAsync<TEntity, TContext, TKey>(
+        public static Task<GenericResult> UpdateEntityAsync<TEntity, TContext, TKey>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity,
-            Func<EntityError> describeConcurrencyFailureError,
+            Func<GenericError> describeConcurrencyFailureError,
             CancellationToken cancellationToken)
             where TEntity : class, IConcurrencyStampWiseEntity
             where TContext : DbContext
@@ -234,7 +234,7 @@ namespace PhantomNet.Entities.EntityFramework
             return UpdateEntityInternalAsync(store, entity, null, describeConcurrencyFailureError, cancellationToken);
         }
 
-        public static Task<EntityResult> UpdateEntityAsync<TEntity, TContext, TKey>(
+        public static Task<GenericResult> UpdateEntityAsync<TEntity, TContext, TKey>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity,
             Action<string> setConcurrencyStamp,
@@ -246,11 +246,11 @@ namespace PhantomNet.Entities.EntityFramework
             return UpdateEntityAsync(store, entity, setConcurrencyStamp, null, cancellationToken);
         }
 
-        public static Task<EntityResult> UpdateEntityAsync<TEntity, TContext, TKey>(
+        public static Task<GenericResult> UpdateEntityAsync<TEntity, TContext, TKey>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity,
             Action<string> setConcurrencyStamp,
-            Func<EntityError> describeConcurrencyFailureError,
+            Func<GenericError> describeConcurrencyFailureError,
             CancellationToken cancellationToken)
             where TEntity : class
             where TContext : DbContext
@@ -268,7 +268,7 @@ namespace PhantomNet.Entities.EntityFramework
 
         #region Delete
 
-        public static Task<EntityResult> DeleteEntityAsync<TEntity, TContext, TKey>(
+        public static Task<GenericResult> DeleteEntityAsync<TEntity, TContext, TKey>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity, CancellationToken cancellationToken)
             where TEntity : class
@@ -278,10 +278,10 @@ namespace PhantomNet.Entities.EntityFramework
             return DeleteEntityAsync(store, entity, cancellationToken, null);
         }
 
-        public static async Task<EntityResult> DeleteEntityAsync<TEntity, TContext, TKey>(
+        public static async Task<GenericResult> DeleteEntityAsync<TEntity, TContext, TKey>(
             this IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity, CancellationToken cancellationToken,
-            Func<EntityError> describeConcurrencyFailureError)
+            Func<GenericError> describeConcurrencyFailureError)
             where TEntity : class
             where TContext : DbContext
             where TKey : IEquatable<TKey>
@@ -301,12 +301,12 @@ namespace PhantomNet.Entities.EntityFramework
             }
             catch (DbUpdateConcurrencyException)
             {
-                return EntityResult.Failed(describeConcurrencyFailureError == null ?
+                return GenericResult.Failed(describeConcurrencyFailureError == null ?
                     new EntityErrorDescriber().ConcurrencyFailure() :
                     describeConcurrencyFailureError());
             }
 
-            return EntityResult.Success;
+            return GenericResult.Success;
         }
 
         #endregion
@@ -440,11 +440,11 @@ namespace PhantomNet.Entities.EntityFramework
 
         #region Helpers
 
-        private static async Task<EntityResult> UpdateEntityInternalAsync<TEntity, TContext, TKey>(
+        private static async Task<GenericResult> UpdateEntityInternalAsync<TEntity, TContext, TKey>(
             IEntityStoreMarker<TEntity, TContext, TKey> store,
             TEntity entity,
             Action<string> setConcurrencyStamp,
-            Func<EntityError> describeConcurrencyFailureError,
+            Func<GenericError> describeConcurrencyFailureError,
             CancellationToken cancellationToken)
             where TEntity : class
             where TContext : DbContext
@@ -476,12 +476,12 @@ namespace PhantomNet.Entities.EntityFramework
             }
             catch (DbUpdateConcurrencyException)
             {
-                return EntityResult.Failed(describeConcurrencyFailureError == null ?
+                return GenericResult.Failed(describeConcurrencyFailureError == null ?
                     new EntityErrorDescriber().ConcurrencyFailure() :
                     describeConcurrencyFailureError());
             }
 
-            return EntityResult.Success;
+            return GenericResult.Success;
         }
 
         private static async Task<T> FindEntityByIdInternalAsync<TEntity, TKey, T>(

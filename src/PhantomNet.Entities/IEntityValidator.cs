@@ -8,13 +8,13 @@ namespace PhantomNet.Entities
         where TSubEntity : class
         where TEntityManager : class
     {
-        Task<EntityResult> ValidateAsync(TEntityManager manager, TSubEntity subEntity);
+        Task<GenericResult> ValidateAsync(TEntityManager manager, TSubEntity subEntity);
     }
 
     public interface IEntityValidator<in TEntity, in TEntityManager>
         where TEntity : class
         where TEntityManager : class
     {
-        Task<EntityResult> ValidateAsync(TEntityManager manager, TEntity entity);
+        Task<GenericResult> ValidateAsync(TEntityManager manager, TEntity entity);
     }
 }

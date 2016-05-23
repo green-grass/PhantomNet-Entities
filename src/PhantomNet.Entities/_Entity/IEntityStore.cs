@@ -14,11 +14,11 @@ namespace PhantomNet.Entities
     public interface IEntityStore<TEntity> : IDisposable
         where TEntity : class
     {
-        Task<EntityResult> CreateAsync(TEntity entity, CancellationToken cancellationToken);
+        Task<GenericResult> CreateAsync(TEntity entity, CancellationToken cancellationToken);
 
-        Task<EntityResult> UpdateAsync(TEntity entity, CancellationToken cancellationToken);
+        Task<GenericResult> UpdateAsync(TEntity entity, CancellationToken cancellationToken);
 
-        Task<EntityResult> DeleteAsync(TEntity entity, CancellationToken cancellationToken);
+        Task<GenericResult> DeleteAsync(TEntity entity, CancellationToken cancellationToken);
 
         Task<T> FindByIdAsync<T>(string id, CancellationToken cancellationToken)
             where T : class;
