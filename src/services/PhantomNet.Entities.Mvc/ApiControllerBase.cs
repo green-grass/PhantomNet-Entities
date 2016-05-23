@@ -238,13 +238,13 @@ namespace PhantomNet.Entities.Mvc
             catch (Exception e)
             {
                 return new {
-                    Result = EntityResult.Failed(new EntityError { Description = e.Message })
+                    Result = GenericResult.Failed(new GenericError { Description = e.Message })
                 };
             }
         }
 
         protected virtual async Task<dynamic> PutModel(string id, [FromBody]TModel model,
-            Func<EntityError> describeModelNotFoundError,
+            Func<GenericError> describeModelNotFoundError,
             Action<TModel> updateModel)
         {
             try
@@ -253,7 +253,7 @@ namespace PhantomNet.Entities.Mvc
                 if (model == null)
                 {
                     return new {
-                        Result = EntityResult.Failed(describeModelNotFoundError())
+                        Result = GenericResult.Failed(describeModelNotFoundError())
                     };
                 }
 
@@ -267,7 +267,7 @@ namespace PhantomNet.Entities.Mvc
             catch (Exception e)
             {
                 return new {
-                    Result = EntityResult.Failed(new EntityError { Description = e.Message })
+                    Result = GenericResult.Failed(new GenericError { Description = e.Message })
                 };
             }
         }
@@ -280,7 +280,7 @@ namespace PhantomNet.Entities.Mvc
                 if (model == null)
                 {
                     return new {
-                        Result = EntityResult.Success
+                        Result = GenericResult.Success
                     };
                 }
 
@@ -292,7 +292,7 @@ namespace PhantomNet.Entities.Mvc
             catch (Exception e)
             {
                 return new {
-                    Result = EntityResult.Failed(new EntityError { Description = e.Message })
+                    Result = GenericResult.Failed(new GenericError { Description = e.Message })
                 };
             }
         }
