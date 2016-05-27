@@ -212,48 +212,6 @@ namespace PhantomNet.Entities
         #endregion
     }
 
-    // GroupedEntity
-    partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
-    {
-        #region Properties
-
-        protected virtual bool SupportsGroupedEntity
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return Store is IGroupedEntityStore<TEntity, TSubEntity>;
-            }
-        }
-
-        protected virtual IGroupedEntityStore<TEntity, TSubEntity> GroupedEntityStore
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var store = Store as IGroupedEntityStore<TEntity, TSubEntity>;
-                if (store == null)
-                {
-                    throw new NotSupportedException(Resources.StoreNotIGroupedEntityStore);
-                }
-
-                return store;
-            }
-        }
-
-        #endregion
-
-        #region Public Operations
-
-        protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(TSubEntity group, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
-        {
-            ThrowIfDisposed();
-            return SearchEntitiesInternalAsync(GroupedEntityStore.FilterByGroup(Entities, group), search, pageNumber, pageSize, sort, reverse);
-        }
-
-        #endregion
-    }
-
     // ScopedNameBasedEntity
     partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
     {
@@ -566,6 +524,80 @@ namespace PhantomNet.Entities
             return GenericResult.Success;
         }
 
+        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternalAsync(IQueryable<TEntity> models, IEntitySearchParameters<TEntity> parameters)
+        {
+            if (models == null)
+            {
+                throw new ArgumentNullException(nameof(models));
+            }
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            var result = new EntityQueryResult<TEntity>();
+            var offset = ((parameters.PageNumber - 1) * parameters.PageSize) ?? 0;
+            var limit = parameters.PageSize ?? int.MaxValue;
+
+            // Pre-filter
+            models = parameters.PreFilter(models);
+            if (SupportsEntity)
+            {
+                result.TotalCount = await EntityStore.CountAsync(models, CancellationToken);
+            }
+            else
+            {
+                result.TotalCount = models.Count();
+            }
+
+            // Filter
+            models = parameters.Filter(models);
+            if (SupportsEntity)
+            {
+                result.FilterredCount = await EntityStore.CountAsync(models, CancellationToken);
+            }
+            else
+            {
+                result.FilterredCount = models.Count();
+            }
+
+            // Pre-sort
+            models = parameters.PreSort(models);
+
+            // Sort
+            var sort = parameters.SortExpression;
+            var reverse = parameters.SortReverse;
+            if (string.IsNullOrWhiteSpace(sort))
+            {
+                models = parameters.DefaultSort(models);
+            }
+            else
+            {
+                if (sort.StartsWith("-"))
+                {
+                    sort = sort.TrimStart('-');
+                    reverse = !reverse;
+                }
+
+                var param = Expression.Parameter(typeof(TEntity));
+                var propertyInfo = typeof(TEntity).GetProperty(sort);
+                var propertyExpression = Expression.Lambda(Expression.Property(param, propertyInfo), param);
+                models = (IOrderedQueryable<TEntity>)models.Provider.CreateQuery(Expression.Call(
+                    typeof(Queryable),
+                    models.Expression.Type == typeof(IOrderedQueryable<TEntity>) ?
+                        (reverse ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy)) :
+                        (reverse ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy)),
+                    new Type[] { typeof(TEntity), propertyInfo.PropertyType },
+                    models.Expression,
+                    propertyExpression
+                ));
+            }
+
+            result.Results = models.Skip(offset).Take(limit);
+            await TryEeagerLoadingEntities(result.Results);
+            return result;
+        }
+
         protected virtual async Task TryEeagerLoadingEntities(IEnumerable<TEntity> entities)
         {
             if (SupportsEagerLoadingEntity)
@@ -580,7 +612,7 @@ namespace PhantomNet.Entities
 
         protected virtual async Task TryEeagerLoadingEntity(TEntity entity)
         {
-            if (entity != null && SupportsEagerLoadingEntity)
+            if (SupportsEagerLoadingEntity && entity != null)
             {
                 await EagerLoadingEntityStore.EagerLoadAsync(entity, CancellationToken);
             }
@@ -730,10 +762,10 @@ namespace PhantomNet.Entities
             return entity;
         }
 
-        protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(string search, int? pageNumber, int? pageSize, string sort, bool reverse)
+        protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(IEntitySearchParameters<TEntity> parameters)
         {
             ThrowIfDisposed();
-            return SearchEntitiesInternalAsync(Entities, search, pageNumber, pageSize, sort, reverse);
+            return SearchEntitiesInternalAsync(Entities, parameters);
         }
 
         #endregion
@@ -751,57 +783,6 @@ namespace PhantomNet.Entities
             await PrepareEntityForUpdatingAsync(entity);
 
             return await EntityStore.UpdateAsync(entity, CancellationToken);
-        }
-
-        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternalAsync(IQueryable<TEntity> models, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
-        {
-            if (models == null)
-            {
-                throw new ArgumentNullException(nameof(models));
-            }
-
-            var result = new EntityQueryResult<TEntity>();
-            var offset = ((pageNumber - 1) * pageSize) ?? 0;
-            var limit = pageSize ?? int.MaxValue;
-
-            result.TotalCount = await EntityStore.CountAsync(models, CancellationToken);
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                models = EntityStore.Filter(models, NormalizeEntityKey(search));
-            }
-            result.FilterredCount = await EntityStore.CountAsync(models, CancellationToken);
-
-            models = EntityStore.PreSort(models);
-            if (string.IsNullOrWhiteSpace(sort))
-            {
-                models = EntityStore.DefaultSort(models);
-            }
-            else
-            {
-                if (sort.StartsWith("-"))
-                {
-                    sort = sort.TrimStart('-');
-                    reverse = !reverse;
-                }
-
-                var param = Expression.Parameter(typeof(TEntity));
-                var propertyInfo = typeof(TEntity).GetProperty(sort);
-                var propertyExpression = Expression.Lambda(Expression.Property(param, propertyInfo), param);
-                models = (IOrderedQueryable<TEntity>)models.Provider.CreateQuery(Expression.Call(
-                    typeof(Queryable),
-                    models.Expression.Type == typeof(IOrderedQueryable<TEntity>) ?
-                        (reverse ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy)) :
-                        (reverse ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy)),
-                    new Type[] { typeof(TEntity), propertyInfo.PropertyType },
-                    models.Expression,
-                    propertyExpression
-                ));
-            }
-
-            result.Results = models.Skip(offset).Take(limit);
-            await TryEeagerLoadingEntities(result.Results);
-            return result;
         }
 
         #endregion
@@ -834,48 +815,6 @@ namespace PhantomNet.Entities
 
                 return store;
             }
-        }
-
-        #endregion
-    }
-
-    // ActivatableEntity
-    partial class EntityManagerBase<TEntity, TEntityManager>
-    {
-        #region Properties
-
-        protected virtual bool SupportsActivatableEntity
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return Store is IActivatableEntityStore<TEntity>;
-            }
-        }
-
-        protected virtual IActivatableEntityStore<TEntity> ActivatableEntityStore
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var store = Store as IActivatableEntityStore<TEntity>;
-                if (store == null)
-                {
-                    throw new NotSupportedException(Resources.StoreNotIActivatableEntityStore);
-                }
-
-                return store;
-            }
-        }
-
-        #endregion
-
-        #region Public Operations
-
-        protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(bool? isActive, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
-        {
-            ThrowIfDisposed();
-            return SearchEntitiesInternalAsync(ActivatableEntityStore.FilterByIsActive(Entities, isActive), search, pageNumber, pageSize, sort, reverse);
         }
 
         #endregion

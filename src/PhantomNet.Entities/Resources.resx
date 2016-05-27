@@ -126,9 +126,6 @@
   <data name="GenericClassNotMatched" xml:space="preserve">
     <value>Generic class {0} must also be used as class parameter.</value>
   </data>
-  <data name="StoreNotIActivatableEntityStore" xml:space="preserve">
-    <value>Store does not implement IActivatableEntityStore&lt;TEntity&gt;.</value>
-  </data>
   <data name="StoreNotICodeBasedEntityStore" xml:space="preserve">
     <value>Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;.</value>
   </data>
@@ -140,9 +137,6 @@
   </data>
   <data name="StoreNotIEntityWithSubEntityStore" xml:space="preserve">
     <value>Store does not implement IEntityStore&lt;TEntity, TSubEntity&gt;.</value>
-  </data>
-  <data name="StoreNotIGroupedEntityStore" xml:space="preserve">
-    <value>Store does not implement IGroupedEntityStore&lt;TEntity, TEntityGroup&gt;.</value>
   </data>
   <data name="StoreNotIMasterDetailsEntityStore" xml:space="preserve">
     <value>Store does not implement IMasterDetailsEntityStore&lt;TEntity, TEntityDetail&gt;.</value>

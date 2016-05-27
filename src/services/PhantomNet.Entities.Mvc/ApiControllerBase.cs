@@ -6,77 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace PhantomNet.Entities.Mvc
 {
     // Foundation
-    public abstract partial class ApiControllerBase<TModel, TSubModel, TModelManager, TErrorDescriber>
-        : ApiControllerBase<TModel, TModelManager, TErrorDescriber>
-        where TModel : class
-        where TSubModel : class
-        where TModelManager : IDisposable
-        where TErrorDescriber : class
-    {
-        public ApiControllerBase(TModelManager manager, TErrorDescriber errorDescriber)
-            : base(manager, errorDescriber)
-        { }
-    }
-
-    // GroupedEntity
-    partial class ApiControllerBase<TModel, TSubModel, TModelManager, TErrorDescriber>
-    {
-        #region Properties
-
-        protected virtual bool SupportsGroupedEntity
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return Manager is IGroupedEntityManager<TModel, TSubModel>;
-            }
-        }
-
-        protected virtual IGroupedEntityManager<TModel, TSubModel> GroupedEntityManager
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var manager = Manager as IGroupedEntityManager<TModel, TSubModel>;
-                if (manager == null)
-                {
-                    throw new NotSupportedException(Resources.ManagerNotIGroupedEntityManager);
-                }
-
-                return manager;
-            }
-        }
-
-        #endregion
-
-        #region Public Operations
-
-        protected virtual Task<IEnumerable<TModel>> GetModels(string token, TSubModel group, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
-        {
-            return GetModels(token, group, search, pageNumber, pageSize, sort, reverse, null);
-        }
-
-        protected virtual async Task<IEnumerable<TModel>> GetModels(string token, TSubModel group, string search, int? pageNumber, int? pageSize, string sort, bool reverse,
-            Action<TModel> preProcessReturnedModel)
-        {
-            var result = await GroupedEntityManager.SearchAsync(group, search, pageNumber, pageSize, sort, reverse);
-            Response.Headers["total-count"] = result.TotalCount.ToString();
-            Response.Headers["filtered-count"] = result.FilterredCount.ToString();
-            Response.Headers["token"] = token;
-            if (preProcessReturnedModel != null)
-            {
-                foreach (var model in result.Results)
-                {
-                    preProcessReturnedModel(model);
-                }
-            }
-            return result.Results;
-        }
-
-        #endregion
-    }
-
-    // Foundation
     public abstract partial class ApiControllerBase<TModel, TModelManager, TErrorDescriber> : Controller
         where TModel : class
         where TModelManager : IDisposable
@@ -163,15 +92,15 @@ namespace PhantomNet.Entities.Mvc
 
         #region Public Operations
 
-        protected virtual Task<IEnumerable<TModel>> GetModels(string token, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
+        protected virtual Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchParameters<TModel> parameters)
         {
-            return GetModels(token, search, pageNumber, pageSize, sort, reverse, null);
+            return GetModels(token, parameters, null);
         }
 
-        protected virtual async Task<IEnumerable<TModel>> GetModels(string token, string search, int? pageNumber, int? pageSize, string sort, bool reverse,
+        protected virtual async Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchParameters<TModel> parameters,
             Action<TModel> preProcessReturnedModel)
         {
-            var result = await EntityManager.SearchAsync(search, pageNumber, pageSize, sort, reverse);
+            var result = await EntityManager.SearchAsync(parameters);
             Response.Headers["total-count"] = result.TotalCount.ToString();
             Response.Headers["filtered-count"] = result.FilterredCount.ToString();
             Response.Headers["token"] = token;

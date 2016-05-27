@@ -23,12 +23,6 @@ namespace PhantomNet.Entities
         Task<T> FindByIdAsync<T>(string id, CancellationToken cancellationToken)
             where T : class;
 
-        IQueryable<TEntity> Filter(IQueryable<TEntity> query, string filter);
-
-        IQueryable<TEntity> PreSort(IQueryable<TEntity> query);
-
-        IQueryable<TEntity> DefaultSort(IQueryable<TEntity> query);
-
         Task<int> CountAsync(IQueryable<TEntity> entities, CancellationToken cancellationToken);
     }
 }

@@ -22,7 +22,7 @@ namespace PhantomNet.Entities {
     // with the /str option, or rebuild your VS project.
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -87,15 +87,6 @@ namespace PhantomNet.Entities {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to Store does not implement IActivatableEntityStore&lt;TEntity&gt;..
-        /// </summary>
-        public static string StoreNotIActivatableEntityStore {
-            get {
-                return ResourceManager.GetString("StoreNotIActivatableEntityStore", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///    Looks up a localized string similar to Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;..
         /// </summary>
         public static string StoreNotICodeBasedEntityStore {
@@ -128,15 +119,6 @@ namespace PhantomNet.Entities {
         public static string StoreNotIEntityWithSubEntityStore {
             get {
                 return ResourceManager.GetString("StoreNotIEntityWithSubEntityStore", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Store does not implement IGroupedEntityStore&lt;TEntity, TEntityGroup&gt;..
-        /// </summary>
-        public static string StoreNotIGroupedEntityStore {
-            get {
-                return ResourceManager.GetString("StoreNotIGroupedEntityStore", resourceCulture);
             }
         }
         
