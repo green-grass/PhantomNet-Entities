@@ -33,7 +33,7 @@ namespace PhantomNet.Entities
             }
             else if (nameSelector != null)
             {
-                return nameSelector.Compile().Invoke(entity);
+                return nameSelector.Compile()(entity);
             }
             else if (directGetName != null)
             {
@@ -84,10 +84,10 @@ namespace PhantomNet.Entities
 
         public static void SetEntityNormalizedName<TEntity>(
             this INameBasedEntityAccessor<TEntity> accessor,
-            TEntity entity, string name)
+            TEntity entity, string normalizedName)
             where TEntity : class, INameWiseEntity
         {
-            SetEntityNormalizedName(accessor, entity, name, null, null);
+            SetEntityNormalizedName(accessor, entity, normalizedName, null, null);
         }
 
         public static void SetEntityNormalizedName<TEntity>(

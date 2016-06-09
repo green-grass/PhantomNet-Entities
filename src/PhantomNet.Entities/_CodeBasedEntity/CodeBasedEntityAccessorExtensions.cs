@@ -33,7 +33,7 @@ namespace PhantomNet.Entities
             }
             else if (codeSelector != null)
             {
-                return codeSelector.Compile().Invoke(entity);
+                return codeSelector.Compile()(entity);
             }
             else if (directGetCode != null)
             {

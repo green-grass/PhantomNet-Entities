@@ -74,7 +74,7 @@ namespace PhantomNet.Entities.EntityFramework
 
             if (dataCreateDateSelector != null)
             {
-                return entities.OrderByDescending(x => dataCreateDateSelector.Compile().Invoke(x)).FirstOrDefaultAsync(cancellationToken);
+                return entities.OrderByDescending(dataCreateDateSelector).FirstOrDefaultAsync(cancellationToken);
             }
 
             if (typeof(ITimeWiseEntity).IsAssignableFrom(typeof(TEntity)))

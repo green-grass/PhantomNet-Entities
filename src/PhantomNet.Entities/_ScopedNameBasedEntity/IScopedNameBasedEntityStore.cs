@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,5 +10,9 @@ namespace PhantomNet.Entities
         where TEntityScope : class
     {
         Task<TEntity> FindByNameAsync(string normalizedName, TEntityScope scope, CancellationToken cancellationToken);
+
+        Task<IEnumerable<TEntityScope>> GetAllScopesAsync(CancellationToken cancellationToken);
+
+        Task<IEnumerable<TEntityScope>> GetScopesWithEntitiesAsync(CancellationToken cancellationToken);
     }
 }

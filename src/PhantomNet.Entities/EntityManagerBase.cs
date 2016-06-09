@@ -62,6 +62,18 @@ namespace PhantomNet.Entities
 
         #region Helpers
 
+        protected override async Task PrepareEntityForValidationAsync(TEntity entity)
+        {
+            await base.PrepareEntityForValidationAsync(entity);
+
+            if (SupportsScopedNameBasedEntity)
+            {
+                var scopeId = ScopedNameBasedEntityAccessor.GetScopeId(entity);
+                var scope = await EntityWithSubEntityStore.FindByIdAsync<TSubEntity>(scopeId, CancellationToken);
+                ScopedNameBasedEntityAccessor.SetScope(entity, scope);
+            }
+        }
+
         protected override async Task PrepareEntityForCreatingAsync(TEntity entity)
         {
             await base.PrepareEntityForCreatingAsync(entity);
@@ -273,6 +285,19 @@ namespace PhantomNet.Entities
             return entity;
         }
 
+
+        protected virtual Task<IEnumerable<TSubEntity>> GetAllEntityScopesAsync()
+        {
+            ThrowIfDisposed();
+            return ScopedNameBasedStore.GetAllScopesAsync(CancellationToken);
+        }
+
+        protected virtual Task<IEnumerable<TSubEntity>> GetEntityScopesWithEntitiesAsync()
+        {
+            ThrowIfDisposed();
+            return ScopedNameBasedStore.GetScopesWithEntitiesAsync(CancellationToken);
+        }
+
         #endregion
 
         #region Helpers
@@ -452,7 +477,7 @@ namespace PhantomNet.Entities
             return (KeyNormalizer == null) ? key : KeyNormalizer.Normalize(key);
         }
 
-        protected virtual async Task PrepareEntityForCreateValidationAsync(TEntity entity)
+        protected virtual async Task PrepareEntityForValidationAsync(TEntity entity)
         {
             if (SupportsCodeBasedEntity)
             {
@@ -524,23 +549,23 @@ namespace PhantomNet.Entities
             return GenericResult.Success;
         }
 
-        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternalAsync(IQueryable<TEntity> models, IEntitySearchParameters<TEntity> parameters)
+        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternalAsync(IQueryable<TEntity> models, IEntitySearchDescriptor<TEntity> searchDescriptor)
         {
             if (models == null)
             {
                 throw new ArgumentNullException(nameof(models));
             }
-            if (parameters == null)
+            if (searchDescriptor == null)
             {
-                throw new ArgumentNullException(nameof(parameters));
+                throw new ArgumentNullException(nameof(searchDescriptor));
             }
 
             var result = new EntityQueryResult<TEntity>();
-            var offset = ((parameters.PageNumber - 1) * parameters.PageSize) ?? 0;
-            var limit = parameters.PageSize ?? int.MaxValue;
+            var offset = ((searchDescriptor.PageNumber - 1) * searchDescriptor.PageSize) ?? 0;
+            var limit = searchDescriptor.PageSize ?? int.MaxValue;
 
             // Pre-filter
-            models = parameters.PreFilter(models);
+            models = searchDescriptor.PreFilter(models);
             if (SupportsEntity)
             {
                 result.TotalCount = await EntityStore.CountAsync(models, CancellationToken);
@@ -551,7 +576,7 @@ namespace PhantomNet.Entities
             }
 
             // Filter
-            models = parameters.Filter(models);
+            models = searchDescriptor.Filter(models);
             if (SupportsEntity)
             {
                 result.FilterredCount = await EntityStore.CountAsync(models, CancellationToken);
@@ -562,14 +587,14 @@ namespace PhantomNet.Entities
             }
 
             // Pre-sort
-            models = parameters.PreSort(models);
+            models = searchDescriptor.PreSort(models);
 
             // Sort
-            var sort = parameters.SortExpression;
-            var reverse = parameters.SortReverse;
+            var sort = searchDescriptor.SortExpression;
+            var reverse = searchDescriptor.SortReverse;
             if (string.IsNullOrWhiteSpace(sort))
             {
-                models = parameters.DefaultSort(models);
+                models = searchDescriptor.DefaultSort(models);
             }
             else
             {
@@ -713,7 +738,7 @@ namespace PhantomNet.Entities
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            await PrepareEntityForCreateValidationAsync(entity);
+            await PrepareEntityForValidationAsync(entity);
 
             var result = await ValidateEntityInternalAsync(entity);
             if (!result.Succeeded)
@@ -762,10 +787,10 @@ namespace PhantomNet.Entities
             return entity;
         }
 
-        protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(IEntitySearchParameters<TEntity> parameters)
+        protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(IEntitySearchDescriptor<TEntity> searchDescriptor)
         {
             ThrowIfDisposed();
-            return SearchEntitiesInternalAsync(Entities, parameters);
+            return SearchEntitiesInternalAsync(Entities, searchDescriptor);
         }
 
         #endregion
@@ -774,6 +799,8 @@ namespace PhantomNet.Entities
 
         protected virtual async Task<GenericResult> UpdateEntityInternalAsync(TEntity entity)
         {
+            await PrepareEntityForValidationAsync(entity);
+
             var result = await ValidateEntityInternalAsync(entity);
             if (!result.Succeeded)
             {

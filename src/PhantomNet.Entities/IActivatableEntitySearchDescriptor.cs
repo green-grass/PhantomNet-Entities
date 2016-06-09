@@ -1,6 +1,6 @@
 ﻿namespace PhantomNet.Entities
 {
-    public interface IActivatableEntitySearchParameters
+    public interface IActivatableEntitySearchDescriptor
     {
         bool? IsActive { get; set; }
     }

@@ -76,7 +76,7 @@ namespace PhantomNet.Entities.EntityFramework
             where TEntity : class
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if(entities == null)
+            if (entities == null)
             {
                 throw new ArgumentNullException(nameof(entities));
             }
@@ -87,7 +87,7 @@ namespace PhantomNet.Entities.EntityFramework
 
             if (codeSelector != null)
             {
-                return entities.SingleOrDefaultAsync(x => codeSelector.Compile().Invoke(x) == normalizedCode, cancellationToken);
+                return entities.SingleOrDefaultAsync(codeSelector, normalizedCode, cancellationToken);
             }
 
             if (typeof(ICodeWiseEntity).IsAssignableFrom(typeof(TEntity)))

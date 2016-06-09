@@ -92,15 +92,15 @@ namespace PhantomNet.Entities.Mvc
 
         #region Public Operations
 
-        protected virtual Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchParameters<TModel> parameters)
+        protected virtual Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchDescriptor<TModel> searchDescriptor)
         {
-            return GetModels(token, parameters, null);
+            return GetModels(token, searchDescriptor, null);
         }
 
-        protected virtual async Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchParameters<TModel> parameters,
+        protected virtual async Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchDescriptor<TModel> searchDescriptor,
             Action<TModel> preProcessReturnedModel)
         {
-            var result = await EntityManager.SearchAsync(parameters);
+            var result = await EntityManager.SearchAsync(searchDescriptor);
             Response.Headers["total-count"] = result.TotalCount.ToString();
             Response.Headers["filtered-count"] = result.FilterredCount.ToString();
             Response.Headers["token"] = token;
@@ -147,10 +147,7 @@ namespace PhantomNet.Entities.Mvc
                 var result = await EntityManager.CreateAsync(model);
                 if (result.Succeeded)
                 {
-                    if (preProcessReturnedModel != null)
-                    {
-                        preProcessReturnedModel(model);
-                    }
+                    preProcessReturnedModel?.Invoke(model);
                     return new {
                         Result = result,
                         Model = model

@@ -35,7 +35,7 @@ namespace PhantomNet.Entities
             }
             else if (nameSelector != null)
             {
-                return nameSelector.Compile().Invoke(entity);
+                return nameSelector.Compile()(entity);
             }
             else if (directGetName != null)
             {
@@ -144,7 +144,7 @@ namespace PhantomNet.Entities
 
             if (scopeSelector != null)
             {
-                return scopeSelector.Compile().Invoke(entity);
+                return scopeSelector.Compile()(entity);
             }
             else if (directGetScope != null)
             {

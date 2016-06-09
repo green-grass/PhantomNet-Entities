@@ -102,7 +102,7 @@ namespace PhantomNet.Entities.EntityFramework
             TKey scopeId;
             if (idSelector != null)
             {
-                scopeId = idSelector.Compile().Invoke(scope);
+                scopeId = idSelector.Compile()(scope);
             }
             else if (scope is IIdWiseEntity<TKey>)
             {

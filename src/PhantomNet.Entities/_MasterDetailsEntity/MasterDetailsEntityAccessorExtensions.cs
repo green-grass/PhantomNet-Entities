@@ -36,7 +36,7 @@ namespace PhantomNet.Entities
             }
             else if (nameSelector != null)
             {
-                return nameSelector.Compile().Invoke(entity);
+                return nameSelector.Compile()(entity);
             }
             else if (directGetDetails != null)
             {

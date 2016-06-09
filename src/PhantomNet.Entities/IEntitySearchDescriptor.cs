@@ -2,7 +2,7 @@
 
 namespace PhantomNet.Entities
 {
-    public interface IEntitySearchParameters<TEntity>
+    public interface IEntitySearchDescriptor<TEntity>
         where TEntity : class
     {
         string SearchText { get; set; }

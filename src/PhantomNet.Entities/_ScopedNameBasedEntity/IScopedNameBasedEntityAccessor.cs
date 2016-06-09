@@ -4,6 +4,8 @@
         where TEntity : class
         where TEntityScope : class
     {
+        string GetScopeId(TEntity entity);
+
         TEntityScope GetScope(TEntity entity);
 
         void SetScope(TEntity entity, TEntityScope scope);

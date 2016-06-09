@@ -146,7 +146,7 @@ namespace PhantomNet.Entities.EntityFramework
 
                 if (entityIdSelector != null)
                 {
-                    return await entities.SingleOrDefaultAsync(x => entityIdSelector.Compile().Invoke(x).Equals(key), cancellationToken) as T;
+                    return await entities.SingleOrDefaultAsync(entityIdSelector, key, cancellationToken) as T;
                 }
 
                 if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity)))
@@ -165,7 +165,7 @@ namespace PhantomNet.Entities.EntityFramework
 
                 if (subEntityIdSelector != null)
                 {
-                    return await subEntities.SingleOrDefaultAsync(x => subEntityIdSelector.Compile().Invoke(x).Equals(key), cancellationToken) as T;
+                    return await subEntities.SingleOrDefaultAsync(subEntityIdSelector, key, cancellationToken) as T;
                 }
 
                 if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TSubEntity)))
@@ -433,7 +433,7 @@ namespace PhantomNet.Entities.EntityFramework
 
             if (idSelector != null)
             {
-                return await entities.SingleOrDefaultAsync(x => idSelector.Compile().Invoke(x).Equals(key), cancellationToken) as T;
+                return await entities.SingleOrDefaultAsync(idSelector, key, cancellationToken) as T;
             }
 
             if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity)))

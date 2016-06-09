@@ -37,7 +37,7 @@ namespace PhantomNet.Entities
             }
             else if (idSelector != null)
             {
-                return ConvertIdToString(idSelector.Compile().Invoke(subEntity));
+                return ConvertIdToString(idSelector.Compile()(subEntity));
             }
             else if (directGetId != null)
             {
@@ -77,7 +77,7 @@ namespace PhantomNet.Entities
             }
             else if (idSelector != null)
             {
-                return ConvertIdToString(idSelector.Compile().Invoke(entity));
+                return ConvertIdToString(idSelector.Compile()(entity));
             }
             else if (directGetId != null)
             {

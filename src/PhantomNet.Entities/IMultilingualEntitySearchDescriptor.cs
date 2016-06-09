@@ -1,6 +1,6 @@
 ﻿namespace PhantomNet.Entities
 {
-    public interface IMultilingualEntitySearchParameters
+    public interface IMultilingualEntitySearchDescriptor
     {
         string Language { get; set; }
     }

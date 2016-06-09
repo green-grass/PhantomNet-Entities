@@ -87,7 +87,7 @@ namespace PhantomNet.Entities.EntityFramework
 
             if (normalizedNameSelector != null)
             {
-                return entities.SingleOrDefaultAsync(x => normalizedNameSelector.Compile().Invoke(x) == normalizedName, cancellationToken);
+                return entities.SingleOrDefaultAsync(normalizedNameSelector, normalizedName, cancellationToken);
             }
 
             if (typeof(INameWiseEntity).IsAssignableFrom(typeof(TEntity)))

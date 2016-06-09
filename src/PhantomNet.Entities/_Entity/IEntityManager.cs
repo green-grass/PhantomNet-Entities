@@ -20,6 +20,6 @@ namespace PhantomNet.Entities
 
         Task<TEntity> FindByIdAsync(string id);
 
-        Task<EntityQueryResult<TEntity>> SearchAsync(IEntitySearchParameters<TEntity> parameters);
+        Task<EntityQueryResult<TEntity>> SearchAsync(IEntitySearchDescriptor<TEntity> searchDescriptor);
     }
 }
