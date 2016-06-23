@@ -123,6 +123,15 @@ namespace PhantomNet.Entities {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to Store does not implement IFilterableEntityStore&lt;TEntity&gt;..
+        /// </summary>
+        public static string StoreNotIFilterableEntityStore {
+            get {
+                return ResourceManager.GetString("StoreNotIFilterableEntityStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Store does not implement IGroupedEntityStore&lt;TEntity, TEntityGroup&gt;..
         /// </summary>
         public static string StoreNotIGroupedEntityStore {

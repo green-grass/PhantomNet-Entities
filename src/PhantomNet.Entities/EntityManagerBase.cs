@@ -494,6 +494,30 @@ namespace PhantomNet.Entities
             }
         }
 
+        protected virtual bool SupportsFilterableEntity
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return Store is IFilterableEntityStore<TEntity>;
+            }
+        }
+
+        protected virtual IFilterableEntityStore<TEntity> FilterableEntityStore
+        {
+            get
+            {
+                ThrowIfDisposed();
+                var store = Store as IFilterableEntityStore<TEntity>;
+                if (store == null)
+                {
+                    throw new NotSupportedException(Resources.StoreNotIFilterableEntityStore);
+                }
+
+                return store;
+            }
+        }
+
         protected virtual bool SupportsEagerLoadingEntity
         {
             get
@@ -599,11 +623,11 @@ namespace PhantomNet.Entities
             return GenericResult.Success;
         }
 
-        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternalAsync(IQueryable<TEntity> models, IEntitySearchDescriptor<TEntity> searchDescriptor)
+        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternalAsync(IQueryable<TEntity> entities, IEntitySearchDescriptor<TEntity> searchDescriptor)
         {
-            if (models == null)
+            if (entities == null)
             {
-                throw new ArgumentNullException(nameof(models));
+                throw new ArgumentNullException(nameof(entities));
             }
             if (searchDescriptor == null)
             {
@@ -615,36 +639,44 @@ namespace PhantomNet.Entities
             var limit = searchDescriptor.PageSize ?? int.MaxValue;
 
             // Pre-filter
-            models = searchDescriptor.PreFilter(models);
+            entities = searchDescriptor.PreFilter(entities);
+            if (SupportsFilterableEntity)
+            {
+                entities = FilterableEntityStore.PreFilter(entities, searchDescriptor);
+            }
             if (SupportsEntity)
             {
-                result.TotalCount = await EntityStore.CountAsync(models, CancellationToken);
+                result.TotalCount = await EntityStore.CountAsync(entities, CancellationToken);
             }
             else
             {
-                result.TotalCount = models.Count();
+                result.TotalCount = entities.Count();
             }
 
             // Filter
-            models = searchDescriptor.Filter(models);
+            entities = searchDescriptor.Filter(entities);
+            if (SupportsFilterableEntity)
+            {
+                entities = FilterableEntityStore.Filter(entities, searchDescriptor);
+            }
             if (SupportsEntity)
             {
-                result.FilterredCount = await EntityStore.CountAsync(models, CancellationToken);
+                result.FilterredCount = await EntityStore.CountAsync(entities, CancellationToken);
             }
             else
             {
-                result.FilterredCount = models.Count();
+                result.FilterredCount = entities.Count();
             }
 
             // Pre-sort
-            models = searchDescriptor.PreSort(models);
+            entities = searchDescriptor.PreSort(entities);
 
             // Sort
             var sort = searchDescriptor.SortExpression;
             var reverse = searchDescriptor.SortReverse;
             if (string.IsNullOrWhiteSpace(sort))
             {
-                models = searchDescriptor.DefaultSort(models);
+                entities = searchDescriptor.DefaultSort(entities);
             }
             else
             {
@@ -657,18 +689,18 @@ namespace PhantomNet.Entities
                 var param = Expression.Parameter(typeof(TEntity));
                 var propertyInfo = typeof(TEntity).GetProperty(sort);
                 var propertyExpression = Expression.Lambda(Expression.Property(param, propertyInfo), param);
-                models = (IOrderedQueryable<TEntity>)models.Provider.CreateQuery(Expression.Call(
+                entities = (IOrderedQueryable<TEntity>)entities.Provider.CreateQuery(Expression.Call(
                     typeof(Queryable),
-                    models.Expression.Type == typeof(IOrderedQueryable<TEntity>) ?
+                    entities.Expression.Type == typeof(IOrderedQueryable<TEntity>) ?
                         (reverse ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy)) :
                         (reverse ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy)),
                     new Type[] { typeof(TEntity), propertyInfo.PropertyType },
-                    models.Expression,
+                    entities.Expression,
                     propertyExpression
                 ));
             }
 
-            result.Results = models.Skip(offset).Take(limit);
+            result.Results = entities.Skip(offset).Take(limit);
             await TryEeagerLoadingEntities(result.Results);
             return result;
         }
