@@ -4,14 +4,11 @@ using System.Threading.Tasks;
 
 namespace PhantomNet.Entities
 {
-    public interface IScopedNameBasedEntityManager<TEntity, TEntityScope> : IDisposable
+    public interface IScopedNameBasedEntityManager<TEntity, TEntityScope>
+        : IGroupedEntityManager<TEntity, TEntityScope>
         where TEntity : class
         where TEntityScope : class
     {
         Task<TEntity> FindByNameAsync(string name, TEntityScope scope);
-
-        Task<IEnumerable<TEntityScope>> GetAllScopesAsync();
-
-        Task<IEnumerable<TEntityScope>> GetScopesWithEntitiesAsync();
     }
 }

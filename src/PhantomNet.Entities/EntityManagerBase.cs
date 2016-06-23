@@ -68,9 +68,9 @@ namespace PhantomNet.Entities
 
             if (SupportsScopedNameBasedEntity)
             {
-                var scopeId = ScopedNameBasedEntityAccessor.GetScopeId(entity);
+                var scopeId = ScopedNameBasedEntityAccessor.GetGroupId(entity);
                 var scope = await EntityWithSubEntityStore.FindByIdAsync<TSubEntity>(scopeId, CancellationToken);
-                ScopedNameBasedEntityAccessor.SetScope(entity, scope);
+                ScopedNameBasedEntityAccessor.SetGroup(entity, scope);
             }
         }
 
@@ -224,6 +224,69 @@ namespace PhantomNet.Entities
         #endregion
     }
 
+    // GroupedEntity
+    partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
+    {
+        #region Properties
+
+        protected virtual bool SupportsGroupedEntity
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return Store is IGroupedEntityStore<TEntity, TSubEntity> && Accessor is IGroupedEntityAccessor<TEntity, TSubEntity>;
+            }
+        }
+
+        protected virtual IGroupedEntityStore<TEntity, TSubEntity> GroupedStore
+        {
+            get
+            {
+                ThrowIfDisposed();
+                var store = Store as IGroupedEntityStore<TEntity, TSubEntity>;
+                if (store == null)
+                {
+                    throw new NotSupportedException(Resources.StoreNotIGroupedEntityStore);
+                }
+
+                return store;
+            }
+        }
+
+        protected virtual IGroupedEntityAccessor<TEntity, TSubEntity> GroupedEntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as IGroupedEntityAccessor<TEntity, TSubEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
+            }
+        }
+
+        #endregion
+
+        #region Public Operations
+
+        protected virtual Task<IEnumerable<TSubEntity>> GetAllEntityGroupsAsync()
+        {
+            ThrowIfDisposed();
+            return GroupedStore.GetAllGroupsAsync(CancellationToken);
+        }
+
+        protected virtual Task<IEnumerable<TSubEntity>> GetEntityGroupsWithEntitiesAsync()
+        {
+            ThrowIfDisposed();
+            return GroupedStore.GetGroupsWithEntitiesAsync(CancellationToken);
+        }
+
+        #endregion
+    }
+
     // ScopedNameBasedEntity
     partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
     {
@@ -283,19 +346,6 @@ namespace PhantomNet.Entities
             var entity = await ScopedNameBasedStore.FindByNameAsync(NormalizeEntityKey(name), scope, CancellationToken);
             await TryEeagerLoadingEntity(entity);
             return entity;
-        }
-
-
-        protected virtual Task<IEnumerable<TSubEntity>> GetAllEntityScopesAsync()
-        {
-            ThrowIfDisposed();
-            return ScopedNameBasedStore.GetAllScopesAsync(CancellationToken);
-        }
-
-        protected virtual Task<IEnumerable<TSubEntity>> GetEntityScopesWithEntitiesAsync()
-        {
-            ThrowIfDisposed();
-            return ScopedNameBasedStore.GetScopesWithEntitiesAsync(CancellationToken);
         }
 
         #endregion

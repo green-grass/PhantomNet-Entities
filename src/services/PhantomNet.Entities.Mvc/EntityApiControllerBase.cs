@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace PhantomNet.Entities.Mvc
 {
@@ -12,11 +13,26 @@ namespace PhantomNet.Entities.Mvc
         where TModelManager : IDisposable
         where TErrorDescriber : class
     {
-        public EntityApiControllerBase(TModelManager manager, TErrorDescriber errorDescriber)
+        public EntityApiControllerBase(TModelManager manager, TErrorDescriber errorDescriber, IStringLocalizer localizer)
             : base(manager, errorDescriber)
-        { }
+        {
+            Localizer = localizer;
+        }
+
+        protected IStringLocalizer Localizer { get; }
 
         #region Public Operations
+
+        [HttpGet("resources")]
+        public virtual dynamic Resources()
+        {
+            return new {
+                CreateError = Localizer["CreateError"].ToString(),
+                UpdateError = Localizer["UpdateError"].ToString(),
+                DeleteConfirmation = Localizer["DeleteConfirmation"].ToString(),
+                DeleteError = Localizer["DeleteError"].ToString()
+            };
+        }
 
         [HttpGet]
         public virtual Task<IEnumerable<TModel>> Get(string token, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
@@ -33,9 +49,9 @@ namespace PhantomNet.Entities.Mvc
         }
 
         [HttpGet("{id}")]
-        public virtual Task<TModel> Get(string id)
+        public virtual Task<TModel> Get(string token, string id)
         {
-            return GetModel(id, returnedModel => PreProcessReturnedModel(returnedModel));
+            return GetModel(token, id, returnedModel => PreProcessReturnedModel(returnedModel));
         }
 
         [HttpPost]

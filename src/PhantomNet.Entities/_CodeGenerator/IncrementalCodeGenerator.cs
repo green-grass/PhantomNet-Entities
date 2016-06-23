@@ -20,7 +20,7 @@ namespace PhantomNet.Entities
             }
 
             EntityCodeAccessor = entityCodeAccessor;
-            Prefixes = optionsAccessor?.Value?.Prefixes ?? new Dictionary<Type, string>();
+            Prefixes = optionsAccessor.Value.Prefixes ?? new Dictionary<Type, string>();
         }
 
         public IDictionary<Type, string> Prefixes { get; }

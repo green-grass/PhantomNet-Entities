@@ -114,12 +114,12 @@ namespace PhantomNet.Entities.Mvc
             return result.Results;
         }
 
-        protected virtual Task<TModel> GetModel(string id)
+        protected virtual Task<TModel> GetModel(string token, string id)
         {
-            return GetModel(id, null);
+            return GetModel(token, id, null);
         }
 
-        protected virtual async Task<TModel> GetModel(string id, Action<TModel> preProcessReturnedModel)
+        protected virtual async Task<TModel> GetModel(string token, string id, Action<TModel> preProcessReturnedModel)
         {
             ThrowIfDisposed();
             if (id == null)
@@ -128,10 +128,8 @@ namespace PhantomNet.Entities.Mvc
             }
 
             var result = await EntityManager.FindByIdAsync(id);
-            if (preProcessReturnedModel != null)
-            {
-                preProcessReturnedModel(result);
-            }
+            Response.Headers["token"] = token;
+            preProcessReturnedModel?.Invoke(result);
             return result;
         }
 

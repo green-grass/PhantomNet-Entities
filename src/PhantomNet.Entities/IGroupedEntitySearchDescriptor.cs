@@ -2,9 +2,9 @@
 
 namespace PhantomNet.Entities
 {
-    public interface IScopedNameBasedEntitySearchDescriptor<TKey>
+    public interface IGroupedEntitySearchDescriptor<TKey>
         where TKey : IEquatable<TKey>
     {
-        TKey ScopeId { get; set; }
+        TKey GroupId { get; set; }
     }
 }
