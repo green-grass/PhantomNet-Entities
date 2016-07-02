@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PhantomNet.Entities.Mvc
 {
     // Foundation
-    public abstract partial class ApiControllerBase<TModel, TModelManager, TErrorDescriber> : Controller
+    public abstract partial class ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber> : Controller
         where TModel : class
+        where TViewModel : class
         where TModelManager : IDisposable
         where TErrorDescriber : class
     {
@@ -60,7 +62,7 @@ namespace PhantomNet.Entities.Mvc
     }
 
     // Entity
-    partial class ApiControllerBase<TModel, TModelManager, TErrorDescriber>
+    partial class ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber>
     {
         #region Properties
 
@@ -92,34 +94,38 @@ namespace PhantomNet.Entities.Mvc
 
         #region Public Operations
 
-        protected virtual Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchDescriptor<TModel> searchDescriptor)
+        protected virtual Task<IEnumerable<TViewModel>> GetModels(string token, IEntitySearchDescriptor<TModel> searchDescriptor)
         {
             return GetModels(token, searchDescriptor, null);
         }
 
-        protected virtual async Task<IEnumerable<TModel>> GetModels(string token, IEntitySearchDescriptor<TModel> searchDescriptor,
-            Action<TModel> preProcessReturnedModel)
+        protected virtual async Task<IEnumerable<TViewModel>> GetModels(string token, IEntitySearchDescriptor<TModel> searchDescriptor,
+            Action<TViewModel> preProcessReturnedViewModel)
         {
             var result = await EntityManager.SearchAsync(searchDescriptor);
+
             Response.Headers["total-count"] = result.TotalCount.ToString();
             Response.Headers["filtered-count"] = result.FilterredCount.ToString();
             Response.Headers["token"] = token;
-            if (preProcessReturnedModel != null)
+
+            var viewModels = Mapper.Map<IEnumerable<TViewModel>>(result.Results);
+            if (preProcessReturnedViewModel != null)
             {
-                foreach (var model in result.Results)
+                foreach (var viewModel in viewModels)
                 {
-                    preProcessReturnedModel(model);
+                    preProcessReturnedViewModel(viewModel);
                 }
             }
-            return result.Results;
+            return viewModels;
         }
 
-        protected virtual Task<TModel> GetModel(string token, string id)
+        protected virtual Task<TViewModel> GetModel(string token, string id)
         {
             return GetModel(token, id, null);
         }
 
-        protected virtual async Task<TModel> GetModel(string token, string id, Action<TModel> preProcessReturnedModel)
+        protected virtual async Task<TViewModel> GetModel(string token, string id,
+            Action<TViewModel> preProcessReturnedViewModel)
         {
             ThrowIfDisposed();
             if (id == null)
@@ -128,27 +134,33 @@ namespace PhantomNet.Entities.Mvc
             }
 
             var result = await EntityManager.FindByIdAsync(id);
+
             Response.Headers["token"] = token;
-            preProcessReturnedModel?.Invoke(result);
-            return result;
+
+            var viewModel = Mapper.Map<TViewModel>(result);
+            preProcessReturnedViewModel?.Invoke(viewModel);
+            return viewModel;
         }
 
-        protected virtual Task<dynamic> PostModel(TModel model)
+        protected virtual Task<dynamic> PostModel(TViewModel viewModel)
         {
-            return PostModel(model, null);
+            return PostModel(viewModel, null);
         }
 
-        protected virtual async Task<dynamic> PostModel(TModel model, Action<TModel> preProcessReturnedModel)
+        protected virtual async Task<dynamic> PostModel(TViewModel viewModel,
+            Action<TViewModel> preProcessReturnedViewModel)
         {
             try
             {
+                var model = Mapper.Map<TModel>(viewModel);
                 var result = await EntityManager.CreateAsync(model);
                 if (result.Succeeded)
                 {
-                    preProcessReturnedModel?.Invoke(model);
+                    viewModel = Mapper.Map<TViewModel>(model);
+                    preProcessReturnedViewModel?.Invoke(viewModel);
                     return new {
                         Result = result,
-                        Model = model
+                        Model = viewModel
                     };
                 }
                 else
@@ -167,21 +179,21 @@ namespace PhantomNet.Entities.Mvc
             }
         }
 
-        protected virtual async Task<dynamic> PutModel(string id, [FromBody]TModel model,
-            Func<GenericError> describeModelNotFoundError,
-            Action<TModel> updateModel)
+        protected virtual async Task<dynamic> PutModel(string id, [FromBody]TViewModel viewModel,
+            Func<TViewModel, GenericError> describeModelNotFoundError,
+            Action<TModel, TViewModel> updateModel)
         {
             try
             {
                 var oldModel = await EntityManager.FindByIdAsync(id);
-                if (model == null)
+                if (oldModel == null)
                 {
                     return new {
-                        Result = GenericResult.Failed(describeModelNotFoundError())
+                        Result = GenericResult.Failed(describeModelNotFoundError(viewModel))
                     };
                 }
 
-                updateModel(oldModel);
+                updateModel.Invoke(oldModel, viewModel);
 
                 var result = await EntityManager.UpdateAsync(oldModel);
                 return new {

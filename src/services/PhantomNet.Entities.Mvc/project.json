@@ -2,6 +2,7 @@
   "version": "1.0.0-*",
 
   "dependencies": {
+    "AutoMapper.Data": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0-rc2-final",
     "NETStandard.Library": "1.5.0-rc2-24027",
     "PhantomNet.Entities": "1.0.0-*"

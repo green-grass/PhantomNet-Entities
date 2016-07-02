@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
 namespace PhantomNet.Entities.Mvc
 {
-    public abstract class EntityApiControllerBase<TModel, TModelSearchDescriptor, TModelManager, TErrorDescriber>
-        : ApiControllerBase<TModel, TModelManager, TErrorDescriber>
+    public abstract class EntityApiControllerBase<TModel, TViewModel, TModelSearchDescriptor, TModelManager, TErrorDescriber>
+        : ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber>
         where TModel : class
+        where TViewModel : class
         where TModelSearchDescriptor : class, IEntitySearchDescriptor<TModel>, new()
         where TModelManager : IDisposable
         where TErrorDescriber : class
@@ -35,7 +37,7 @@ namespace PhantomNet.Entities.Mvc
         }
 
         [HttpGet]
-        public virtual Task<IEnumerable<TModel>> Get(string token, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
+        public virtual Task<IEnumerable<TViewModel>> Get(string token, string search, int? pageNumber, int? pageSize, string sort, bool reverse)
         {
             var searchDescriptor = new TModelSearchDescriptor() {
                 SearchText = search,
@@ -45,27 +47,27 @@ namespace PhantomNet.Entities.Mvc
                 SortReverse = reverse
             };
 
-            return GetModels(token, searchDescriptor, returnedModel => PreProcessReturnedModel(returnedModel));
+            return GetModels(token, searchDescriptor, returnedViewModel => PreProcessReturnedViewModel(returnedViewModel));
         }
 
         [HttpGet("{id}")]
-        public virtual Task<TModel> Get(string token, string id)
+        public virtual Task<TViewModel> Get(string token, string id)
         {
-            return GetModel(token, id, returnedModel => PreProcessReturnedModel(returnedModel));
+            return GetModel(token, id, returnedViewModel => PreProcessReturnedViewModel(returnedViewModel));
         }
 
         [HttpPost]
-        public virtual Task<dynamic> Post([FromBody]TModel model)
+        public virtual Task<dynamic> Post([FromBody]TViewModel viewModel)
         {
-            return PostModel(model, returnedModel => PreProcessReturnedModel(returnedModel));
+            return PostModel(viewModel, returnedViewModel => PreProcessReturnedViewModel(returnedViewModel));
         }
 
         [HttpPut("{id}")]
-        public virtual Task<dynamic> Put(string id, [FromBody]TModel model)
+        public virtual Task<dynamic> Put(string id, [FromBody]TViewModel viewModel)
         {
-            return PutModel(id, model,
-                describeModelNotFoundError: () => DescribeModelNotFoundError(model),
-                updateModel: oldModel => UpdateModel(oldModel, model));
+            return PutModel(id, viewModel,
+                describeModelNotFoundError: DescribeModelNotFoundError,
+                updateModel: UpdateModel);
         }
 
         [HttpDelete("{id}")]
@@ -78,11 +80,14 @@ namespace PhantomNet.Entities.Mvc
 
         #region Helpers
 
-        protected abstract GenericError DescribeModelNotFoundError(TModel model);
+        protected abstract GenericError DescribeModelNotFoundError(TViewModel viewModel);
 
-        protected abstract void UpdateModel(TModel oldModel, TModel newModel);
+        protected virtual void PreProcessReturnedViewModel(TViewModel viewModel) { }
 
-        protected virtual void PreProcessReturnedModel(TModel model) { }
+        protected virtual void UpdateModel(TModel oldModel, TViewModel viewModel)
+        {
+            Mapper.Map(viewModel, oldModel);
+        }
 
         #endregion
     }
