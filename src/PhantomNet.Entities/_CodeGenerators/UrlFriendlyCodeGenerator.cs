@@ -7,8 +7,7 @@ namespace PhantomNet.Entities
 {
     public class UrlFriendlyCodeGenerator<TEntity, TEntityManager> : IEntityCodeGenerator<TEntity, TEntityManager>
         where TEntity : class
-        where TEntityManager : class,
-                               ICodeBasedEntityManager<TEntity>
+        where TEntityManager : class
     {
         public UrlFriendlyCodeGenerator(INameBasedEntityAccessor<TEntity> entityNameAccessor, IOptions<UrlFriendlyCodeGeneratorOptions> optionsAccessor)
         {

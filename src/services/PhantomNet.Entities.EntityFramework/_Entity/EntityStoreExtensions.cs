@@ -75,7 +75,7 @@ namespace PhantomNet.Entities.EntityFramework
     public static partial class EntityStoreExtensions
     {
         public static Task<T> FindEntityOrSubEntityByIdAsync<TEntity, TSubEntity, TContext, TKey, T>(
-            this IQueryableEntityStoreMarker<TEntity, TSubEntity, TContext, TKey> store,
+            this IEntityStoreMarker<TEntity, TSubEntity, TContext, TKey> store,
             IQueryable<TEntity> entities,
             IQueryable<TSubEntity> subEntities,
             string id,
