@@ -102,6 +102,11 @@ namespace PhantomNet.Entities.Mvc
         protected virtual async Task<IEnumerable<TViewModel>> GetModels(string token, IEntitySearchDescriptor<TModel> searchDescriptor,
             Action<TViewModel> preProcessReturnedViewModel)
         {
+            if (!string.IsNullOrWhiteSpace(searchDescriptor.SortExpression))
+            {
+                searchDescriptor.SortExpression = searchDescriptor.SortExpression.Length > 1 ? $"{searchDescriptor.SortExpression.Substring(0, 1).ToUpper()}{searchDescriptor.SortExpression.Substring(1)}" : searchDescriptor.SortExpression.ToUpper();
+            }
+
             var result = await EntityManager.SearchAsync(searchDescriptor);
 
             Response.Headers["total-count"] = result.TotalCount.ToString();

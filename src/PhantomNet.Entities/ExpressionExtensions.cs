@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace System.Linq.Expressions
 {
     // Coppied from EntityFramework
-    // https://github.com/aspnet/EntityFramework/blob/c12b548b94579e67ae8d57ec11f992e918cfea4e/src/Microsoft.EntityFrameworkCore/Extensions/Internal/ExpressionExtensions.cs
+    // https://github.com/aspnet/EntityFramework/blob/dev/src/Microsoft.EntityFrameworkCore/Extensions/Internal/ExpressionExtensions.cs
     internal static class ExpressionExtensions
     {
         public static PropertyInfo GetPropertyAccess(this LambdaExpression propertyAccessExpression)
         {
+            Debug.Assert(propertyAccessExpression.Parameters.Count == 1);
+
             var parameterExpression = propertyAccessExpression.Parameters.Single();
             var propertyInfo = parameterExpression.MatchSimplePropertyAccess(propertyAccessExpression.Body);
 
@@ -45,6 +48,8 @@ namespace System.Linq.Expressions
 
         public static IReadOnlyList<PropertyInfo> GetPropertyAccessList(this LambdaExpression propertyAccessExpression)
         {
+            Debug.Assert(propertyAccessExpression.Parameters.Count == 1);
+
             var propertyPaths
                 = MatchPropertyAccessList(propertyAccessExpression, (p, e) => e.MatchSimplePropertyAccess(p));
 
@@ -61,6 +66,8 @@ namespace System.Linq.Expressions
         private static IReadOnlyList<PropertyInfo> MatchPropertyAccessList(
             this LambdaExpression lambdaExpression, Func<Expression, Expression, PropertyInfo> propertyMatcher)
         {
+            Debug.Assert(lambdaExpression.Body != null);
+
             var newExpression
                 = RemoveConvert(lambdaExpression.Body) as NewExpression;
 
@@ -95,6 +102,8 @@ namespace System.Linq.Expressions
 
         public static PropertyInfo[] GetComplexPropertyAccess(this LambdaExpression propertyAccessExpression)
         {
+            Debug.Assert(propertyAccessExpression.Parameters.Count == 1);
+
             var propertyPath
                 = propertyAccessExpression
                     .Parameters
@@ -159,6 +168,27 @@ namespace System.Linq.Expressions
             }
 
             return expression as TExpression;
+        }
+
+        public static bool IsLogicalOperation(this Expression expression)
+        {
+            // TODO:: Check.NotNull(expression, nameof(expression));
+
+            return (expression.NodeType == ExpressionType.AndAlso)
+                   || (expression.NodeType == ExpressionType.OrElse);
+        }
+
+        public static bool IsComparisonOperation(this Expression expression)
+        {
+            // TODO:: Check.NotNull(expression, nameof(expression));
+
+            return (expression.NodeType == ExpressionType.Equal)
+                   || (expression.NodeType == ExpressionType.NotEqual)
+                   || (expression.NodeType == ExpressionType.LessThan)
+                   || (expression.NodeType == ExpressionType.LessThanOrEqual)
+                   || (expression.NodeType == ExpressionType.GreaterThan)
+                   || (expression.NodeType == ExpressionType.GreaterThanOrEqual)
+                   || (expression.NodeType == ExpressionType.Not);
         }
     }
 }
