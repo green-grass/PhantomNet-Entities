@@ -3,7 +3,7 @@
   "copyright": "Green Grass",
   "description": "PhantomNet.Entities.Mvc class library",
   "language": "en",
-  "version": "1.0.1",
+  "version": "1.1.0-beta-*",
   "authors": [ "Minh Nguyen" ],
 
   "packOptions": {
@@ -15,7 +15,7 @@
     "AutoMapper": "5.0.2",
     "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0",
     "NETStandard.Library": "1.6.0",
-    "PhantomNet.Entities": "1.0.1-*"
+    "PhantomNet.Entities": "1.1.0-*"
   },
 
   "frameworks": {
