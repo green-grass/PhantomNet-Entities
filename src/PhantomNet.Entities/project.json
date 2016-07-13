@@ -3,7 +3,7 @@
   "copyright": "Green Grass",
   "description": "PhantomNet.Entities class library",
   "language": "en",
-  "version": "1.0.0",
+  "version": "1.0.1-beta-*",
   "authors": [ "Minh Nguyen" ],
 
   "packOptions": {
