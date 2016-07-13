@@ -1,7 +1,7 @@
-﻿{
-  "title": "PhantomNet.Entities",
+{
+  "title": "PhantomNet.Entities.EntityFrameworkCore",
   "copyright": "Green Grass",
-  "description": "PhantomNet.Entities class library",
+  "description": "PhantomNet.Entities.EntityFrameworkCore class library",
   "language": "en",
   "version": "1.0.0-rc1-*",
   "authors": [ "Minh Nguyen" ],
@@ -12,14 +12,10 @@
   },
 
   "dependencies": {
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
-    "Microsoft.Extensions.Options": "1.0.0",
+    "Microsoft.EntityFrameworkCore": "1.0.0",
     "NETStandard.Library": "1.6.0",
-    "PhantomNet.Core": "1.0.0-*",
-    "PhantomNet.Entities.EntityMarkers": "1.0.0-*",
-    "System.Globalization.Extensions": "4.0.1",
-    "System.Linq.Queryable": "4.0.1",
-    "System.Reflection.TypeExtensions": "4.1.0"
+    "PhantomNet.Entities": "1.0.0-*",
+    "System.ComponentModel.TypeConverter": "4.1.0"
   },
 
   "frameworks": {

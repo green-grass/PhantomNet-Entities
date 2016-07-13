@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace PhantomNet.Entities.EntityFramework
+namespace PhantomNet.Entities.EntityFrameworkCore
 {
     public interface IQueryableEntityStoreMarker<TEntity, TSubEntity, TContext, TKey>
         : IEntityStoreMarker<TEntity, TSubEntity, TContext, TKey>,

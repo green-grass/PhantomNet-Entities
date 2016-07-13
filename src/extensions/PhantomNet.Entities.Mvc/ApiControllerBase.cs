@@ -138,11 +138,11 @@ namespace PhantomNet.Entities.Mvc
                 throw new ArgumentNullException(nameof(id));
             }
 
-            var result = await EntityManager.FindByIdAsync(id);
+            var model = await EntityManager.FindByIdAsync(id);
 
             Response.Headers["token"] = token;
 
-            var viewModel = Mapper.Map<TViewModel>(result);
+            var viewModel = Mapper.Map<TViewModel>(model);
             preProcessReturnedViewModel?.Invoke(viewModel);
             return viewModel;
         }

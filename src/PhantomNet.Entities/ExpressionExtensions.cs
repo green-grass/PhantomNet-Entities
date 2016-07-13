@@ -4,8 +4,8 @@ using System.Reflection;
 
 namespace System.Linq.Expressions
 {
-    // Coppied from EntityFramework
-    // https://github.com/aspnet/EntityFramework/blob/dev/src/Microsoft.EntityFrameworkCore/Extensions/Internal/ExpressionExtensions.cs
+    // Coppied from EntityFrameworkCore
+    // https://github.com/aspnet/EntityFrameworkCore/blob/dev/src/Microsoft.EntityFrameworkCore/Extensions/Internal/ExpressionExtensions.cs
     internal static class ExpressionExtensions
     {
         public static PropertyInfo GetPropertyAccess(this LambdaExpression propertyAccessExpression)

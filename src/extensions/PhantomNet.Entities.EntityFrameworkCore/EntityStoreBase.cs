@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
-namespace PhantomNet.Entities.EntityFramework
+namespace PhantomNet.Entities.EntityFrameworkCore
 {
     public abstract class EntityStoreBase<TEntity, TContext, TKey>
         where TEntity : class

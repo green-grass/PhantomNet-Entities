@@ -1,5 +1,15 @@
 ﻿{
-  "version": "1.0.0-*",
+  "title": "PhantomNet.Entities.EntityMarkers",
+  "copyright": "Green Grass",
+  "description": "PhantomNet.Entities.EntityMarkers class library",
+  "language": "en",
+  "version": "1.0.0-rc1-*",
+  "authors": [ "Minh Nguyen" ],
+
+  "packOptions": {
+    "licenseUrl": "https://github.com/green-grass/PhantomNet-Entities/blob/master/LICENSE",
+    "projectUrl": "https://github.com/green-grass/PhantomNet-Entities"
+  },
 
   "dependencies": {
     "NETStandard.Library": "1.6.0"

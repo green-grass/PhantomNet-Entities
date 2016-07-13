@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
-namespace PhantomNet.Entities.EntityFramework
+namespace PhantomNet.Entities.EntityFrameworkCore
 {
     public abstract class QueryableEntityStoreBase<TEntity, TSubEntity, TContext, TKey>
         : QueryableEntityStoreBase<TEntity, TContext, TKey>

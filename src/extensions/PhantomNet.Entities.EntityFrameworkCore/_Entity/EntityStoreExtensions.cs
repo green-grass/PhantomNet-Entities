@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace PhantomNet.Entities.EntityFramework
+namespace PhantomNet.Entities.EntityFrameworkCore
 {
     public static partial class QueryableEntityStoreExtensions
     {

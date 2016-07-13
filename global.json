@@ -2,7 +2,7 @@
   "projects": [
     "src",
     "test",
-    "src/services",
+    "src/extensions",
     "../PhantomNet-Core/src"
   ],
   "sdk": {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace PhantomNet.Entities.EntityFramework
+namespace PhantomNet.Entities.EntityFrameworkCore
 {
     public interface IQueryableScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey>
         : IScopedNameBasedEntityStoreMarker<TEntity, TEntityScope, TContext, TKey>,

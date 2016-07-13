@@ -629,17 +629,13 @@ namespace PhantomNet.Entities
             {
                 throw new ArgumentNullException(nameof(entities));
             }
-            if (searchDescriptor == null)
-            {
-                throw new ArgumentNullException(nameof(searchDescriptor));
-            }
 
             var result = new EntityQueryResult<TEntity>();
-            var offset = ((searchDescriptor.PageNumber - 1) * searchDescriptor.PageSize) ?? 0;
-            var limit = searchDescriptor.PageSize ?? int.MaxValue;
+            var offset = ((searchDescriptor?.PageNumber - 1) * searchDescriptor?.PageSize) ?? 0;
+            var limit = searchDescriptor?.PageSize ?? int.MaxValue;
 
             // Pre-filter
-            entities = searchDescriptor.PreFilter(entities);
+            entities = searchDescriptor?.PreFilter(entities) ?? entities;
             if (SupportsFilterableEntity)
             {
                 entities = FilterableEntityStore.PreFilter(entities, searchDescriptor);
@@ -654,7 +650,7 @@ namespace PhantomNet.Entities
             }
 
             // Filter
-            entities = searchDescriptor.Filter(entities);
+            entities = searchDescriptor?.Filter(entities) ?? entities;
             if (SupportsFilterableEntity)
             {
                 entities = FilterableEntityStore.Filter(entities, searchDescriptor);
@@ -669,14 +665,14 @@ namespace PhantomNet.Entities
             }
 
             // Pre-sort
-            entities = searchDescriptor.PreSort(entities);
+            entities = searchDescriptor?.PreSort(entities) ?? entities;
 
             // Sort
-            var sort = searchDescriptor.SortExpression;
-            var reverse = searchDescriptor.SortReverse;
+            var sort = searchDescriptor?.SortExpression;
+            var reverse = searchDescriptor?.SortReverse;
             if (string.IsNullOrWhiteSpace(sort))
             {
-                entities = searchDescriptor.DefaultSort(entities);
+                entities = searchDescriptor?.DefaultSort(entities) ?? entities;
             }
             else
             {
@@ -692,8 +688,8 @@ namespace PhantomNet.Entities
                 entities = (IOrderedQueryable<TEntity>)entities.Provider.CreateQuery(Expression.Call(
                     typeof(Queryable),
                     entities.Expression.Type == typeof(IOrderedQueryable<TEntity>) ?
-                        (reverse ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy)) :
-                        (reverse ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy)),
+                        (reverse.Value ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy)) :
+                        (reverse.Value ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy)),
                     new Type[] { typeof(TEntity), propertyInfo.PropertyType },
                     entities.Expression,
                     propertyExpression
