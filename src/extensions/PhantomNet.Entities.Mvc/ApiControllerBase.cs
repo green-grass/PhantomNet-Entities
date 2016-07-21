@@ -21,9 +21,9 @@ namespace PhantomNet.Entities.Mvc
 
         #region Properties
 
-        protected virtual TModelManager Manager { get; }
+        protected TModelManager Manager { get; }
 
-        protected virtual TErrorDescriber ErrorDescriber { get; }
+        protected TErrorDescriber ErrorDescriber { get; }
 
         #endregion
 

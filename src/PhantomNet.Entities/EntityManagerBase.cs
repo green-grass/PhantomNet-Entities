@@ -465,15 +465,15 @@ namespace PhantomNet.Entities
         private IList<IEntityValidator<TEntity, TEntityManager>> EntityValidators { get; }
             = new List<IEntityValidator<TEntity, TEntityManager>>();
 
-        private ILookupNormalizer KeyNormalizer { get; set; }
+        private ILookupNormalizer KeyNormalizer { get; }
 
-        private IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; set; }
+        private IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; }
 
-        private EntityErrorDescriber ErrorDescriber { get; set; }
+        private EntityErrorDescriber ErrorDescriber { get; }
 
         protected virtual CancellationToken CancellationToken => CancellationToken.None;
 
-        protected ILogger Logger { get; set; }
+        protected ILogger Logger { get; }
 
         protected IDisposable Store { get; }
 
