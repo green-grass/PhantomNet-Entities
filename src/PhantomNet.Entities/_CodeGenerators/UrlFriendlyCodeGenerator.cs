@@ -26,7 +26,7 @@ namespace PhantomNet.Entities
             cancellationToken.ThrowIfCancellationRequested();
 
             var name = EntityNameAccessor.GetName(entity);
-            return Task.FromResult(new StringProcessor().ToUrlFriendly(name));
+            return Task.FromResult(name.ToUrlFriendly());
         }
     }
 }
