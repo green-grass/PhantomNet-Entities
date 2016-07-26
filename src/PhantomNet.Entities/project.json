@@ -3,7 +3,7 @@
   "copyright": "Green Grass",
   "description": "PhantomNet.Entities class library",
   "language": "en",
-  "version": "1.0.2",
+  "version": "1.0.3-beta-*",
   "authors": [ "Minh Nguyen" ],
 
   "packOptions": {
@@ -16,7 +16,7 @@
     "Microsoft.Extensions.Options": "1.0.0",
     "NETStandard.Library": "1.6.0",
     "PhantomNet.Core": "1.0.2",
-    "PhantomNet.Entities.EntityMarkers": "1.0.2",
+    "PhantomNet.Entities.EntityMarkers": "1.0.3-*",
     "System.Globalization.Extensions": "4.0.1",
     "System.Linq.Queryable": "4.0.1",
     "System.Reflection.TypeExtensions": "4.1.0"
