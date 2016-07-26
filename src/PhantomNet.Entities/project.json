@@ -15,7 +15,7 @@
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
     "Microsoft.Extensions.Options": "1.0.0",
     "NETStandard.Library": "1.6.0",
-    "PhantomNet.Core": "1.0.0",
+    "PhantomNet.Core": "1.1.0-*",
     "PhantomNet.Entities.EntityMarkers": "1.1.0-*",
     "System.Globalization.Extensions": "4.0.1",
     "System.Linq.Queryable": "4.0.1",

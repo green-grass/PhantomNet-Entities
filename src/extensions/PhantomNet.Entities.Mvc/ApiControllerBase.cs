@@ -104,7 +104,7 @@ namespace PhantomNet.Entities.Mvc
         {
             if (!string.IsNullOrWhiteSpace(searchDescriptor.SortExpression))
             {
-                searchDescriptor.SortExpression = searchDescriptor.SortExpression.Length > 1 ? $"{searchDescriptor.SortExpression.Substring(0, 1).ToUpper()}{searchDescriptor.SortExpression.Substring(1)}" : searchDescriptor.SortExpression.ToUpper();
+                searchDescriptor.SortExpression = searchDescriptor.SortExpression.ToPascalCase();
             }
 
             var result = await EntityManager.SearchAsync(searchDescriptor);
