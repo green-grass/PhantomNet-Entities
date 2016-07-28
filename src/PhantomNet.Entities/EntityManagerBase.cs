@@ -431,7 +431,7 @@ namespace PhantomNet.Entities
         {
             if (!(this is TEntityManager))
             {
-                throw new NotSupportedException(string.Format(Resources.GenericClassNotMatched, nameof(TEntityManager)));
+                throw new NotSupportedException(Resources.FormatGenericClassNotMatched(nameof(TEntityManager)));
             }
             if (store == null)
             {
