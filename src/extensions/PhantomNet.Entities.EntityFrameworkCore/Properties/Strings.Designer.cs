@@ -5,10 +5,10 @@ namespace PhantomNet.Entities.EntityFrameworkCore
     using System.Reflection;
     using System.Resources;
 
-    internal static class Resources
+    internal static class Strings
     {
         private static readonly ResourceManager _resourceManager
-            = new ResourceManager("PhantomNet.Entities.EntityFrameworkCore.Resources", typeof(Resources).GetTypeInfo().Assembly);
+            = new ResourceManager("PhantomNet.Entities.EntityFrameworkCore.Strings", typeof(Strings).GetTypeInfo().Assembly);
 
         /// <summary>
         /// Entity type {0} must be {1}.

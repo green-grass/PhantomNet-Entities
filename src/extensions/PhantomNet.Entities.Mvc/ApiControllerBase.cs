@@ -83,7 +83,7 @@ namespace PhantomNet.Entities.Mvc
                 var manager = Manager as IEntityManager<TModel>;
                 if (manager == null)
                 {
-                    throw new NotSupportedException(Resources.ManagerNotIEntityManager);
+                    throw new NotSupportedException(Strings.ManagerNotIEntityManager);
                 }
 
                 return manager;

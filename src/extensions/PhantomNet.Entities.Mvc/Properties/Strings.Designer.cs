@@ -5,10 +5,10 @@ namespace PhantomNet.Entities.Mvc
     using System.Reflection;
     using System.Resources;
 
-    internal static class Resources
+    internal static class Strings
     {
         private static readonly ResourceManager _resourceManager
-            = new ResourceManager("PhantomNet.Entities.Mvc.Resources", typeof(Resources).GetTypeInfo().Assembly);
+            = new ResourceManager("PhantomNet.Entities.Mvc.Strings", typeof(Strings).GetTypeInfo().Assembly);
 
         /// <summary>
         /// Manager does not implement IEntityManager&lt;TEntity&gt;.

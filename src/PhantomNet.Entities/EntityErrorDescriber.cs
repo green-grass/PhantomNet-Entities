@@ -6,7 +6,7 @@
         {
             return new GenericError {
                 Code = nameof(ConcurrencyFailure),
-                Description = Resources.ConcurrencyFailure
+                Description = Strings.ConcurrencyFailure
             };
         }
     }

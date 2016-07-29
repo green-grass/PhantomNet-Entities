@@ -176,7 +176,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new InvalidOperationException();
             }
 
-            throw new InvalidOperationException(Resources.FormatEntityTypeOrSubEntityTypeNotSupported(nameof(T), nameof(TEntity), nameof(TSubEntity)));
+            throw new InvalidOperationException(Strings.FormatEntityTypeOrSubEntityTypeNotSupported(nameof(T), nameof(TEntity), nameof(TSubEntity)));
         }
 
         #endregion
@@ -426,7 +426,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             }
             if (typeof(T) != typeof(TEntity))
             {
-                throw new InvalidOperationException(Resources.FormatEntityTypeNotSupported(nameof(T), nameof(TEntity)));
+                throw new InvalidOperationException(Strings.FormatEntityTypeNotSupported(nameof(T), nameof(TEntity)));
             }
 
             var key = ConvertIdFromString<TKey>(id);

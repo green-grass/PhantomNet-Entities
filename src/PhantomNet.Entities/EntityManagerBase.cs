@@ -167,7 +167,7 @@ namespace PhantomNet.Entities
                 var store = Store as IEntityStore<TEntity, TSubEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIEntityWithSubEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIEntityWithSubEntityStore);
                 }
 
                 return store;
@@ -214,7 +214,7 @@ namespace PhantomNet.Entities
                 var store = Store as IQueryableEntityStore<TEntity, TSubEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIQueryableEntityWithSubEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIQueryableEntityWithSubEntityStore);
                 }
 
                 return store;
@@ -246,7 +246,7 @@ namespace PhantomNet.Entities
                 var store = Store as IGroupedEntityStore<TEntity, TSubEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIGroupedEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIGroupedEntityStore);
                 }
 
                 return store;
@@ -309,7 +309,7 @@ namespace PhantomNet.Entities
                 var store = Store as IScopedNameBasedEntityStore<TEntity, TSubEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIScopedNameBasedEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIScopedNameBasedEntityStore);
                 }
 
                 return store;
@@ -389,7 +389,7 @@ namespace PhantomNet.Entities
                 var store = Store as IMasterDetailsEntityStore<TEntity, TSubEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIMasterDetailsEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIMasterDetailsEntityStore);
                 }
 
                 return store;
@@ -431,7 +431,7 @@ namespace PhantomNet.Entities
         {
             if (!(this is TEntityManager))
             {
-                throw new NotSupportedException(Resources.FormatGenericClassNotMatched(nameof(TEntityManager)));
+                throw new NotSupportedException(Strings.FormatGenericClassNotMatched(nameof(TEntityManager)));
             }
             if (store == null)
             {
@@ -511,7 +511,7 @@ namespace PhantomNet.Entities
                 var store = Store as IFilterableEntityStore<TEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIFilterableEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIFilterableEntityStore);
                 }
 
                 return store;
@@ -535,7 +535,7 @@ namespace PhantomNet.Entities
                 var store = Store as IEagerLoadingEntityStore<TEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIEagerLoadingEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIEagerLoadingEntityStore);
                 }
 
                 return store;
@@ -782,7 +782,7 @@ namespace PhantomNet.Entities
                 var store = Store as IEntityStore<TEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIEntityStore);
                 }
 
                 return store;
@@ -915,7 +915,7 @@ namespace PhantomNet.Entities
                 var store = Store as IQueryableEntityStore<TEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotIQueryableEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotIQueryableEntityStore);
                 }
 
                 return store;
@@ -947,7 +947,7 @@ namespace PhantomNet.Entities
                 var store = Store as ITimeTrackedEntityStore<TEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotITimeTrackedEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotITimeTrackedEntityStore);
                 }
 
                 return store;
@@ -1006,7 +1006,7 @@ namespace PhantomNet.Entities
                 var store = Store as ICodeBasedEntityStore<TEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotICodeBasedEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotICodeBasedEntityStore);
                 }
 
                 return store;
@@ -1090,7 +1090,7 @@ namespace PhantomNet.Entities
                 var store = Store as INameBasedEntityStore<TEntity>;
                 if (store == null)
                 {
-                    throw new NotSupportedException(Resources.StoreNotINameBasedEntityStore);
+                    throw new NotSupportedException(Strings.StoreNotINameBasedEntityStore);
                 }
 
                 return store;

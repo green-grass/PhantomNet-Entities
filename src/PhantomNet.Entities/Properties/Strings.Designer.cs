@@ -5,10 +5,10 @@ namespace PhantomNet.Entities
     using System.Reflection;
     using System.Resources;
 
-    internal static class Resources
+    internal static class Strings
     {
         private static readonly ResourceManager _resourceManager
-            = new ResourceManager("PhantomNet.Entities.Resources", typeof(Resources).GetTypeInfo().Assembly);
+            = new ResourceManager("PhantomNet.Entities.Strings", typeof(Strings).GetTypeInfo().Assembly);
 
         /// <summary>
         /// Optimistic concurrency failure, object has been modified.
