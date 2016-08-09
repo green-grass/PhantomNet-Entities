@@ -640,6 +640,8 @@ namespace PhantomNet.Entities
             {
                 entities = FilterableEntityStore.PreFilter(entities, searchDescriptor);
             }
+
+            // Count
             if (SupportsEntity)
             {
                 result.TotalCount = await EntityStore.CountAsync(entities, CancellationToken);
@@ -655,6 +657,8 @@ namespace PhantomNet.Entities
             {
                 entities = FilterableEntityStore.Filter(entities, searchDescriptor);
             }
+
+            // Count
             if (SupportsEntity)
             {
                 result.FilterredCount = await EntityStore.CountAsync(entities, CancellationToken);
