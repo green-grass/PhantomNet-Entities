@@ -696,8 +696,12 @@ namespace PhantomNet.Entities
                 ));
             }
 
+            // Paging
             result.Results = entities.Skip(offset).Take(limit);
+
+            // Eager loading
             await TryEeagerLoadingEntities(result.Results);
+
             return result;
         }
 
