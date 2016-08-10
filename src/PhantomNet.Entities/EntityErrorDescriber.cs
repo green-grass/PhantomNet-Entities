@@ -1,5 +1,6 @@
 ﻿namespace PhantomNet.Entities
 {
+    // TODO:: Refactor
     public class EntityErrorDescriber : ErrorDescriber
     {
         public virtual GenericError ConcurrencyFailure()

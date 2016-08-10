@@ -627,40 +627,55 @@ namespace PhantomNet.Entities
 
             var result = new EntityQueryResult<TEntity>();
 
-            // Pre-filter
+            entities = PreFilter(entities, searchDescriptor);
+            result.TotalCount = await Count(entities);
+
+            entities = Filter(entities, searchDescriptor);
+            result.FilterredCount = await Count(entities);
+
+            entities = Sort(entities, searchDescriptor);
+
+            result.Results = Page(entities, searchDescriptor);
+
+            await TryEeagerLoadingEntities(result.Results);
+
+            return result;
+        }
+
+        protected virtual IQueryable<TEntity> PreFilter(IQueryable<TEntity> entities, IEntitySearchDescriptor<TEntity> searchDescriptor)
+        {
             entities = searchDescriptor?.PreFilter(entities) ?? entities;
             if (SupportsFilterableEntity)
             {
                 entities = FilterableEntityStore.PreFilter(entities, searchDescriptor);
             }
 
-            // Count
-            if (SupportsEntity)
-            {
-                result.TotalCount = await EntityStore.CountAsync(entities, CancellationToken);
-            }
-            else
-            {
-                result.TotalCount = entities.Count();
-            }
+            return entities;
+        }
 
-            // Filter
+        protected virtual IQueryable<TEntity> Filter(IQueryable<TEntity> entities, IEntitySearchDescriptor<TEntity> searchDescriptor)
+        {
             entities = searchDescriptor?.Filter(entities) ?? entities;
             if (SupportsFilterableEntity)
             {
                 entities = FilterableEntityStore.Filter(entities, searchDescriptor);
             }
 
-            // Count
+            return entities;
+        }
+
+        protected virtual async Task<int> Count(IQueryable<TEntity> entities)
+        {
             if (SupportsEntity)
             {
-                result.FilterredCount = await EntityStore.CountAsync(entities, CancellationToken);
-            }
-            else
-            {
-                result.FilterredCount = entities.Count();
+                return await EntityStore.CountAsync(entities, CancellationToken);
             }
 
+            return entities.Count();
+        }
+
+        protected virtual IQueryable<TEntity> Sort(IQueryable<TEntity> entities, IEntitySearchDescriptor<TEntity> searchDescriptor)
+        {
             // Pre-sort
             entities = searchDescriptor?.PreSort(entities) ?? entities;
 
@@ -693,15 +708,14 @@ namespace PhantomNet.Entities
                 ));
             }
 
-            // Paging
+            return entities;
+        }
+
+        protected virtual IQueryable<TEntity> Page(IQueryable<TEntity> entities, IEntitySearchDescriptor<TEntity> searchDescriptor)
+        {
             var offset = ((searchDescriptor?.PageNumber - 1) * searchDescriptor?.PageSize) ?? 0;
             var limit = searchDescriptor?.PageSize ?? int.MaxValue;
-            result.Results = entities.Skip(offset).Take(limit);
-
-            // Eager loading
-            await TryEeagerLoadingEntities(result.Results);
-
-            return result;
+            return entities.Skip(offset).Take(limit);
         }
 
         protected virtual async Task TryEeagerLoadingEntities(IEnumerable<TEntity> entities)
