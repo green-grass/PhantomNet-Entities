@@ -62,9 +62,9 @@ namespace PhantomNet.Entities
 
         #region Helpers
 
-        protected override async Task PrepareEntityForValidationAsync(TEntity entity)
+        protected override async Task PrepareEntityForValidation(TEntity entity)
         {
-            await base.PrepareEntityForValidationAsync(entity);
+            await base.PrepareEntityForValidation(entity);
 
             if (SupportsScopedNameBasedEntity)
             {
@@ -74,9 +74,9 @@ namespace PhantomNet.Entities
             }
         }
 
-        protected override async Task PrepareEntityForCreatingAsync(TEntity entity)
+        protected override async Task PrepareEntityForCreating(TEntity entity)
         {
-            await base.PrepareEntityForCreatingAsync(entity);
+            await base.PrepareEntityForCreating(entity);
 
             if (SupportsScopedNameBasedEntity)
             {
@@ -84,9 +84,9 @@ namespace PhantomNet.Entities
             }
         }
 
-        protected override async Task PrepareEntityForUpdatingAsync(TEntity entity)
+        protected override async Task PrepareEntityForUpdating(TEntity entity)
         {
-            await base.PrepareEntityForUpdatingAsync(entity);
+            await base.PrepareEntityForUpdating(entity);
 
             if (SupportsScopedNameBasedEntity)
             {
@@ -94,9 +94,9 @@ namespace PhantomNet.Entities
             }
         }
 
-        protected override async Task<GenericResult> ValidateEntityInternalAsync(TEntity entity)
+        protected override async Task<GenericResult> ValidateEntityInternal(TEntity entity)
         {
-            var result = await base.ValidateEntityInternalAsync(entity);
+            var result = await base.ValidateEntityInternal(entity);
 
             if (SupportsMasterDetailsEntity)
             {
@@ -104,7 +104,7 @@ namespace PhantomNet.Entities
                 var tasks = new List<Task<GenericResult>>(details.Count);
                 foreach (var detail in details)
                 {
-                    tasks.Add(ValidateSubEntityInternalAsync(detail));
+                    tasks.Add(ValidateSubEntityInternal(detail));
                 }
                 await Task.WhenAll(tasks);
 
@@ -123,7 +123,7 @@ namespace PhantomNet.Entities
             return result;
         }
 
-        protected virtual async Task<GenericResult> ValidateSubEntityInternalAsync(TSubEntity subEntity)
+        protected virtual async Task<GenericResult> ValidateSubEntityInternal(TSubEntity subEntity)
         {
             var errors = new List<GenericError>();
             foreach (var validator in EntityValidators)
@@ -551,18 +551,18 @@ namespace PhantomNet.Entities
             return (KeyNormalizer == null) ? key : KeyNormalizer.Normalize(key);
         }
 
-        protected virtual async Task PrepareEntityForValidationAsync(TEntity entity)
+        protected virtual async Task PrepareEntityForValidation(TEntity entity)
         {
             if (SupportsCodeBasedEntity)
             {
                 if (CodeBasedEntityAccessor.GetCode(entity) == null && CodeGenerator != null)
                 {
-                    CodeBasedEntityAccessor.SetCode(entity, await GenerateEntityCodeAsync(entity));
+                    CodeBasedEntityAccessor.SetCode(entity, await GenerateEntityCode(entity));
                 }
             }
         }
 
-        protected virtual async Task PrepareEntityForCreatingAsync(TEntity entity)
+        protected virtual async Task PrepareEntityForCreating(TEntity entity)
         {
             if (SupportsCodeBasedEntity)
             {
@@ -584,7 +584,7 @@ namespace PhantomNet.Entities
             await Task.FromResult(0);
         }
 
-        protected virtual async Task PrepareEntityForUpdatingAsync(TEntity entity)
+        protected virtual async Task PrepareEntityForUpdating(TEntity entity)
         {
             if (SupportsCodeBasedEntity)
             {
@@ -604,7 +604,7 @@ namespace PhantomNet.Entities
             await Task.FromResult(0);
         }
 
-        protected virtual async Task<GenericResult> ValidateEntityInternalAsync(TEntity entity)
+        protected virtual async Task<GenericResult> ValidateEntityInternal(TEntity entity)
         {
             var errors = new List<GenericError>();
             foreach (var validator in EntityValidators)
@@ -623,7 +623,7 @@ namespace PhantomNet.Entities
             return GenericResult.Success;
         }
 
-        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternalAsync(IQueryable<TEntity> entities, IEntitySearchDescriptor<TEntity> searchDescriptor)
+        protected virtual async Task<EntityQueryResult<TEntity>> SearchEntitiesInternal(IQueryable<TEntity> entities, IEntitySearchDescriptor<TEntity> searchDescriptor)
         {
             if (entities == null)
             {
@@ -824,15 +824,15 @@ namespace PhantomNet.Entities
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            await PrepareEntityForValidationAsync(entity);
+            await PrepareEntityForValidation(entity);
 
-            var result = await ValidateEntityInternalAsync(entity);
+            var result = await ValidateEntityInternal(entity);
             if (!result.Succeeded)
             {
                 return result;
             }
 
-            await PrepareEntityForCreatingAsync(entity);
+            await PrepareEntityForCreating(entity);
 
             result = await EntityStore.CreateAsync(entity, CancellationToken);
             return result;
@@ -846,7 +846,7 @@ namespace PhantomNet.Entities
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            return UpdateEntityInternalAsync(entity);
+            return UpdateEntityInternal(entity);
         }
 
         protected virtual Task<GenericResult> DeleteEntityAsync(TEntity entity)
@@ -876,24 +876,24 @@ namespace PhantomNet.Entities
         protected virtual Task<EntityQueryResult<TEntity>> SearchEntitiesAsync(IEntitySearchDescriptor<TEntity> searchDescriptor)
         {
             ThrowIfDisposed();
-            return SearchEntitiesInternalAsync(Entities, searchDescriptor);
+            return SearchEntitiesInternal(Entities, searchDescriptor);
         }
 
         #endregion
 
         #region Helpers
 
-        protected virtual async Task<GenericResult> UpdateEntityInternalAsync(TEntity entity)
+        protected virtual async Task<GenericResult> UpdateEntityInternal(TEntity entity)
         {
-            await PrepareEntityForValidationAsync(entity);
+            await PrepareEntityForValidation(entity);
 
-            var result = await ValidateEntityInternalAsync(entity);
+            var result = await ValidateEntityInternal(entity);
             if (!result.Succeeded)
             {
                 return result;
             }
 
-            await PrepareEntityForUpdatingAsync(entity);
+            await PrepareEntityForUpdating(entity);
 
             return await EntityStore.UpdateAsync(entity, CancellationToken);
         }
@@ -1063,7 +1063,7 @@ namespace PhantomNet.Entities
             CodeBasedEntityAccessor.SetCode(entity, normalizedCode);
         }
 
-        protected virtual Task<string> GenerateEntityCodeAsync(TEntity entity)
+        protected virtual Task<string> GenerateEntityCode(TEntity entity)
         {
             if (CodeGenerator == null)
             {
