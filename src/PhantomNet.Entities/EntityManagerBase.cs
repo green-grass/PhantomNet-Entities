@@ -23,9 +23,8 @@ namespace PhantomNet.Entities
             IEnumerable<IEntityValidator<TEntity, TSubEntity, TEntityManager>> entityValidators,
             ILookupNormalizer keyNormalizer,
             IEntityCodeGenerator<TEntity, TEntityManager> codeGenerator,
-            EntityErrorDescriber errors,
             ILogger<EntityManagerBase<TEntity, TSubEntity, TEntityManager>> logger)
-            : base(store, entityAccessor, entityValidators, keyNormalizer, codeGenerator, errors, logger)
+            : base(store, entityAccessor, entityValidators, keyNormalizer, codeGenerator, logger)
         {
             if (entityValidators != null)
             {
@@ -426,7 +425,6 @@ namespace PhantomNet.Entities
             IEnumerable<IEntityValidator<TEntity, TEntityManager>> entityValidators,
             ILookupNormalizer keyNormalizer,
             IEntityCodeGenerator<TEntity, TEntityManager> codeGenerator,
-            EntityErrorDescriber errors,
             ILogger<EntityManagerBase<TEntity, TEntityManager>> logger)
         {
             if (!(this is TEntityManager))
@@ -437,16 +435,15 @@ namespace PhantomNet.Entities
             {
                 throw new ArgumentNullException(nameof(store));
             }
-            if (errors == null)
+            if (logger == null)
             {
-                throw new ArgumentNullException(nameof(errors));
+                throw new ArgumentNullException(nameof(logger));
             }
 
             Store = store;
             Accessor = entityAccessor;
             KeyNormalizer = keyNormalizer;
             CodeGenerator = codeGenerator;
-            ErrorDescriber = errors;
             Logger = logger;
 
             if (entityValidators != null)
@@ -468,8 +465,6 @@ namespace PhantomNet.Entities
         private ILookupNormalizer KeyNormalizer { get; }
 
         private IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; }
-
-        private EntityErrorDescriber ErrorDescriber { get; }
 
         protected virtual CancellationToken CancellationToken => CancellationToken.None;
 
@@ -631,8 +626,6 @@ namespace PhantomNet.Entities
             }
 
             var result = new EntityQueryResult<TEntity>();
-            var offset = ((searchDescriptor?.PageNumber - 1) * searchDescriptor?.PageSize) ?? 0;
-            var limit = searchDescriptor?.PageSize ?? int.MaxValue;
 
             // Pre-filter
             entities = searchDescriptor?.PreFilter(entities) ?? entities;
@@ -701,6 +694,8 @@ namespace PhantomNet.Entities
             }
 
             // Paging
+            var offset = ((searchDescriptor?.PageNumber - 1) * searchDescriptor?.PageSize) ?? 0;
+            var limit = searchDescriptor?.PageSize ?? int.MaxValue;
             result.Results = entities.Skip(offset).Take(limit);
 
             // Eager loading
