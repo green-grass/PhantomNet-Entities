@@ -8,7 +8,7 @@ namespace PhantomNet.Entities
         public static string GetEntityLanguage<TEntity>(
             this IMultilingualEntityAccessor<TEntity> accessor,
             TEntity entity)
-            where TEntity : class, ICodeWiseEntity
+            where TEntity : class, ILanguageWiseEntity
         {
             return GetEntityLanguage(accessor, entity, null, null);
         }

@@ -8,7 +8,7 @@ namespace PhantomNet.Entities
         public static bool GetEntityIsActive<TEntity>(
             this IActivatableEntityAccessor<TEntity> accessor,
             TEntity entity)
-            where TEntity : class, ICodeWiseEntity
+            where TEntity : class, IIsActiveWiseEntity
         {
             return GetEntityIsActive(accessor, entity, null, null);
         }
