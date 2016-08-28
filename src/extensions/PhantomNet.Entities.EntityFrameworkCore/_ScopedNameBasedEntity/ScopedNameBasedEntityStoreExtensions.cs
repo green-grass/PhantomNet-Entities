@@ -53,7 +53,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindEntityByNameInternalAsync(entities, normalizedName, scope, scopeIdSelector, null, cancellationToken);
+            return FindEntityByNameInternalAsync(store, entities, normalizedName, scope, scopeIdSelector, null, cancellationToken);
         }
 
         public static Task<TEntity> FindEntityByNameAsync<TEntity, TEntityScope, TContext, TKey>(
@@ -73,10 +73,11 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(idSelector));
             }
 
-            return FindEntityByNameInternalAsync(entities, normalizedName, scope, scopeIdSelector, idSelector, cancellationToken);
+            return FindEntityByNameInternalAsync(store, entities, normalizedName, scope, scopeIdSelector, idSelector, cancellationToken);
         }
 
-        public static Task<TEntity> FindEntityByNameInternalAsync<TEntity, TEntityScope, TKey>(
+        public static async Task<TEntity> FindEntityByNameInternalAsync<TEntity, TEntityScope, TKey>(
+            object store,
             IQueryable<TEntity> entities,
             string normalizedName, TEntityScope scope,
             Expression<Func<TEntity, TKey>> scopeIdSelector,
@@ -100,6 +101,11 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(scopeIdSelector));
             }
 
+            if (store is IEagerLoadingEntityStore<TEntity>)
+            {
+                entities = ((IEagerLoadingEntityStore<TEntity>)store).EagerLoad(entities);
+            }
+
             TKey scopeId;
             if (idSelector != null)
             {
@@ -121,7 +127,14 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             var normalizedNameExpression = Expression.Equal(normalizedNameMember, Expression.Constant(normalizedName));
             var expression = Expression.AndAlso(scopeIdExpression, normalizedNameExpression);
             var predicate = Expression.Lambda<Func<TEntity, bool>>(expression, param);
-            return entities.SingleOrDefaultAsync(predicate, cancellationToken);
+            var entity = await entities.SingleOrDefaultAsync(predicate, cancellationToken);
+
+            if (store is IExplicitLoadingEntityStore<TEntity> && entity != null)
+            {
+                await((IExplicitLoadingEntityStore<TEntity>)store).ExplicitLoadAsync(entity, cancellationToken);
+            }
+
+            return entity;
         }
     }
 }

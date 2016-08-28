@@ -86,7 +86,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             where TKey : IEquatable<TKey>
             where T : class
         {
-            return FindEntityOrSubEntityByIdInternalAsync<TEntity, TSubEntity, TKey, T>(entities, subEntities, id, null, null, cancellationToken);
+            return FindEntityOrSubEntityByIdInternalAsync<TEntity, TSubEntity, TKey, T>(store, entities, subEntities, id, null, null, cancellationToken);
         }
 
         public static Task<T> FindEntityOrSubEntityByIdAsync<TEntity, TSubEntity, TContext, TKey, T>(
@@ -112,12 +112,13 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(subEntityIdSelector));
             }
 
-            return FindEntityOrSubEntityByIdInternalAsync<TEntity, TSubEntity, TKey, T>(entities, subEntities, id, entityIdSelector, subEntityIdSelector, cancellationToken);
+            return FindEntityOrSubEntityByIdInternalAsync<TEntity, TSubEntity, TKey, T>(store, entities, subEntities, id, entityIdSelector, subEntityIdSelector, cancellationToken);
         }
 
         #region Helpers
 
         private static async Task<T> FindEntityOrSubEntityByIdInternalAsync<TEntity, TSubEntity, TKey, T>(
+            object store,
             IQueryable<TEntity> entities,
             IQueryable<TSubEntity> subEntities,
             string id,
@@ -144,17 +145,32 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                     throw new ArgumentNullException(nameof(entities));
                 }
 
+                if (store is IEagerLoadingEntityStore<TEntity>)
+                {
+                    entities = ((IEagerLoadingEntityStore<TEntity>)store).EagerLoad(entities);
+                }
+
+                TEntity entity;
+
                 if (entityIdSelector != null)
                 {
-                    return await entities.SingleOrDefaultAsync(entityIdSelector, key, cancellationToken) as T;
+                    entity = await entities.SingleOrDefaultAsync(entityIdSelector, key, cancellationToken);
                 }
-
-                if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity)))
+                else if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity)))
                 {
-                    return await entities.SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken) as T;
+                    entity = await entities.SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken);
+                }
+                else
+                {
+                    throw new InvalidOperationException();
                 }
 
-                throw new InvalidOperationException();
+                if (store is IExplicitLoadingEntityStore<TEntity> && entity != null)
+                {
+                    await ((IExplicitLoadingEntityStore<TEntity>)store).ExplicitLoadAsync(entity, cancellationToken);
+                }
+
+                return entity as T;
             }
             else if (typeof(T) == typeof(TSubEntity))
             {
@@ -163,17 +179,32 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                     throw new ArgumentNullException(nameof(subEntities));
                 }
 
+                if (store is IEagerLoadingEntityStore<TSubEntity>)
+                {
+                    subEntities = ((IEagerLoadingEntityStore<TSubEntity>)store).EagerLoad(subEntities);
+                }
+
+                TSubEntity subEntity;
+
                 if (subEntityIdSelector != null)
                 {
-                    return await subEntities.SingleOrDefaultAsync(subEntityIdSelector, key, cancellationToken) as T;
+                    subEntity = await subEntities.SingleOrDefaultAsync(subEntityIdSelector, key, cancellationToken);
                 }
-
-                if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TSubEntity)))
+                else if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TSubEntity)))
                 {
-                    return await subEntities.SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken) as T;
+                    subEntity = await subEntities.SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken);
+                }
+                else
+                {
+                    throw new InvalidOperationException();
                 }
 
-                throw new InvalidOperationException();
+                if (store is IExplicitLoadingEntityStore<TSubEntity> && subEntity != null)
+                {
+                    await ((IExplicitLoadingEntityStore<TSubEntity>)store).ExplicitLoadAsync(subEntity, cancellationToken);
+                }
+
+                return subEntity as T;
             }
 
             throw new InvalidOperationException(Strings.FormatEntityTypeOrSubEntityTypeNotSupported(nameof(T), nameof(TEntity), nameof(TSubEntity)));
@@ -321,7 +352,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             where TKey : IEquatable<TKey>
             where T : class
         {
-            return FindEntityByIdInternalAsync<TEntity, TKey, T>(entities, id, null, cancellationToken);
+            return FindEntityByIdInternalAsync<TEntity, TKey, T>(store, entities, id, null, cancellationToken);
         }
 
         public static Task<T> FindEntityByIdAsync<TEntity, TContext, TKey, T>(
@@ -340,7 +371,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(idSelector));
             }
 
-            return FindEntityByIdInternalAsync<TEntity, TKey, T>(entities, id, idSelector, cancellationToken);
+            return FindEntityByIdInternalAsync<TEntity, TKey, T>(store, entities, id, idSelector, cancellationToken);
         }
 
         public static Task<int> CountEntitiesAsync<TEntity, TContext, TKey>(
@@ -407,6 +438,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
         }
 
         private static async Task<T> FindEntityByIdInternalAsync<TEntity, TKey, T>(
+            object store,
             IQueryable<TEntity> entities,
             string id,
             Expression<Func<TEntity, TKey>> idSelector,
@@ -431,17 +463,32 @@ namespace PhantomNet.Entities.EntityFrameworkCore
 
             var key = ConvertIdFromString<TKey>(id);
 
+            if (store is IEagerLoadingEntityStore<TEntity>)
+            {
+                entities = ((IEagerLoadingEntityStore<TEntity>)store).EagerLoad(entities);
+            }
+
+            TEntity entity;
+
             if (idSelector != null)
             {
-                return await entities.SingleOrDefaultAsync(idSelector, key, cancellationToken) as T;
+                entity = await entities.SingleOrDefaultAsync(idSelector, key, cancellationToken);
             }
-
-            if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity)))
+            else if (typeof(IIdWiseEntity<TKey>).IsAssignableFrom(typeof(TEntity)))
             {
-                return await entities.SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken) as T;
+                entity = await entities.SingleOrDefaultAsync(x => ((IIdWiseEntity<TKey>)x).Id.Equals(key), cancellationToken);
+            }
+            else
+            {
+                throw new InvalidOperationException();
             }
 
-            throw new InvalidOperationException();
+            if (store is IExplicitLoadingEntityStore<TEntity> && entity != null)
+            {
+                await ((IExplicitLoadingEntityStore<TEntity>)store).ExplicitLoadAsync(entity, cancellationToken);
+            }
+
+            return entity as T;
         }
 
         private static TKey ConvertIdFromString<TKey>(string id)

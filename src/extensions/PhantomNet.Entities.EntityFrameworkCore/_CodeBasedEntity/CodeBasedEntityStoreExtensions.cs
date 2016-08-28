@@ -47,7 +47,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindEntityByCodeInternalAsync(entities, normalizedCode, null, cancellationToken);
+            return FindEntityByCodeInternalAsync(store, entities, normalizedCode, null, cancellationToken);
         }
 
         public static Task<TEntity> FindEntityByCodeAsync<TEntity, TContext, TKey>(
@@ -65,10 +65,11 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(codeSelector));
             }
 
-            return FindEntityByCodeInternalAsync(entities, normalizedCode, codeSelector, cancellationToken);
+            return FindEntityByCodeInternalAsync(store, entities, normalizedCode, codeSelector, cancellationToken);
         }
 
-        private static Task<TEntity> FindEntityByCodeInternalAsync<TEntity>(
+        private static async Task<TEntity> FindEntityByCodeInternalAsync<TEntity>(
+            object store,
             IQueryable<TEntity> entities,
             string normalizedCode,
             Expression<Func<TEntity, string>> codeSelector,
@@ -85,17 +86,32 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(normalizedCode));
             }
 
+            if (store is IEagerLoadingEntityStore<TEntity>)
+            {
+                entities = ((IEagerLoadingEntityStore<TEntity>)store).EagerLoad(entities);
+            }
+
+            TEntity entity;
+
             if (codeSelector != null)
             {
-                return entities.SingleOrDefaultAsync(codeSelector, normalizedCode, cancellationToken);
+                entity = await entities.SingleOrDefaultAsync(codeSelector, normalizedCode, cancellationToken);
             }
-
-            if (typeof(ICodeWiseEntity).IsAssignableFrom(typeof(TEntity)))
+            else if (typeof(ICodeWiseEntity).IsAssignableFrom(typeof(TEntity)))
             {
-                return entities.SingleOrDefaultAsync(x => ((ICodeWiseEntity)x).Code == normalizedCode, cancellationToken);
+                entity = await entities.SingleOrDefaultAsync(x => ((ICodeWiseEntity)x).Code == normalizedCode, cancellationToken);
+            }
+            else
+            {
+                throw new InvalidOperationException();
             }
 
-            throw new InvalidOperationException();
+            if (store is IExplicitLoadingEntityStore<TEntity> && entity != null)
+            {
+                await ((IExplicitLoadingEntityStore<TEntity>)store).ExplicitLoadAsync(entity, cancellationToken);
+            }
+
+            return entity;
         }
     }
 }

@@ -47,7 +47,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindEntityByNameInternalAsync(entities, normalizedName, null, cancellationToken);
+            return FindEntityByNameInternalAsync(store, entities, normalizedName, null, cancellationToken);
         }
 
         public static Task<TEntity> FindEntityByNameAsync<TEntity, TContext, TKey>(
@@ -65,10 +65,11 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(normalizedNameSelector));
             }
 
-            return FindEntityByNameInternalAsync(entities, normalizedName, normalizedNameSelector, cancellationToken);
+            return FindEntityByNameInternalAsync(store, entities, normalizedName, normalizedNameSelector, cancellationToken);
         }
 
-        private static Task<TEntity> FindEntityByNameInternalAsync<TEntity>(
+        private static async Task<TEntity> FindEntityByNameInternalAsync<TEntity>(
+            object store,
             IQueryable<TEntity> entities,
             string normalizedName,
             Expression<Func<TEntity, string>> normalizedNameSelector,
@@ -85,17 +86,32 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(normalizedName));
             }
 
+            if (store is IEagerLoadingEntityStore<TEntity>)
+            {
+                entities = ((IEagerLoadingEntityStore<TEntity>)store).EagerLoad(entities);
+            }
+
+            TEntity entity;
+
             if (normalizedNameSelector != null)
             {
-                return entities.SingleOrDefaultAsync(normalizedNameSelector, normalizedName, cancellationToken);
+                entity = await entities.SingleOrDefaultAsync(normalizedNameSelector, normalizedName, cancellationToken);
             }
-
-            if (typeof(INameWiseEntity).IsAssignableFrom(typeof(TEntity)))
+            else if (typeof(INameWiseEntity).IsAssignableFrom(typeof(TEntity)))
             {
-                return entities.SingleOrDefaultAsync(x => ((INameWiseEntity)x).NormalizedName == normalizedName, cancellationToken);
+                entity = await entities.SingleOrDefaultAsync(x => ((INameWiseEntity)x).Name == normalizedName, cancellationToken);
+            }
+            else
+            {
+                throw new InvalidOperationException();
             }
 
-            throw new InvalidOperationException();
+            if (store is IExplicitLoadingEntityStore<TEntity> && entity != null)
+            {
+                await((IExplicitLoadingEntityStore<TEntity>)store).ExplicitLoadAsync(entity, cancellationToken);
+            }
+
+            return entity;
         }
     }
 }

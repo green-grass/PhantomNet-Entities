@@ -138,6 +138,9 @@
   <data name="StoreNotIEntityWithSubEntityStore" xml:space="preserve">
     <value>Store does not implement IEntityStore&lt;TEntity, TSubEntity&gt;.</value>
   </data>
+  <data name="StoreNotIExplicitLoadingEntityStore" xml:space="preserve">
+    <value>Store does not implement IExplicitLoadingEntityStore&lt;TEntity&gt;.</value>
+  </data>
   <data name="StoreNotIFilterableEntityStore" xml:space="preserve">
     <value>Store does not implement IFilterableEntityStore&lt;TEntity&gt;.</value>
   </data>

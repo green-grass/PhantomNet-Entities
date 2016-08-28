@@ -91,6 +91,22 @@ namespace PhantomNet.Entities
         }
 
         /// <summary>
+        /// Store does not implement IExplicitLoadingEntityStore&lt;TEntity&gt;.
+        /// </summary>
+        internal static string StoreNotIExplicitLoadingEntityStore
+        {
+            get { return GetString("StoreNotIExplicitLoadingEntityStore"); }
+        }
+
+        /// <summary>
+        /// Store does not implement IExplicitLoadingEntityStore&lt;TEntity&gt;.
+        /// </summary>
+        internal static string FormatStoreNotIExplicitLoadingEntityStore()
+        {
+            return GetString("StoreNotIExplicitLoadingEntityStore");
+        }
+
+        /// <summary>
         /// Store does not implement IEntityStore&lt;TEntity&gt;.
         /// </summary>
         internal static string StoreNotIEntityStore

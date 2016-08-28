@@ -44,7 +44,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             where TContext : DbContext
             where TKey : IEquatable<TKey>
         {
-            return FindLatestEntityInternalAsync(entities, null, cancellationToken);
+            return FindLatestEntityInternalAsync(store, entities, null, cancellationToken);
         }
 
         public static Task<TEntity> FindLatestEntityAsync<TEntity, TContext, TKey>(
@@ -61,10 +61,11 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(dataCreateDateSelector));
             }
 
-            return FindLatestEntityInternalAsync(entities, dataCreateDateSelector, cancellationToken);
+            return FindLatestEntityInternalAsync(store, entities, dataCreateDateSelector, cancellationToken);
         }
 
-        private static Task<TEntity> FindLatestEntityInternalAsync<TEntity>(
+        private static async Task<TEntity> FindLatestEntityInternalAsync<TEntity>(
+            object store,
             IQueryable<TEntity> entities,
             Expression<Func<TEntity, string>> dataCreateDateSelector,
             CancellationToken cancellationToken)
@@ -72,17 +73,32 @@ namespace PhantomNet.Entities.EntityFrameworkCore
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            if (store is IEagerLoadingEntityStore<TEntity>)
+            {
+                entities = ((IEagerLoadingEntityStore<TEntity>)store).EagerLoad(entities);
+            }
+
+            TEntity entity;
+
             if (dataCreateDateSelector != null)
             {
-                return entities.OrderByDescending(dataCreateDateSelector).FirstOrDefaultAsync(cancellationToken);
+                entity = await entities.OrderByDescending(dataCreateDateSelector).FirstOrDefaultAsync(cancellationToken);
             }
-
-            if (typeof(ITimeWiseEntity).IsAssignableFrom(typeof(TEntity)))
+            else if (typeof(ITimeWiseEntity).IsAssignableFrom(typeof(TEntity)))
             {
-                return entities.OrderByDescending(x => ((ITimeWiseEntity)x).DataCreateDate).FirstOrDefaultAsync(cancellationToken);
+                entity = await entities.OrderByDescending(x => ((ITimeWiseEntity)x).DataCreateDate).FirstOrDefaultAsync(cancellationToken);
+            }
+            else
+            {
+                throw new InvalidOperationException();
             }
 
-            throw new InvalidOperationException();
+            if (store is IExplicitLoadingEntityStore<TEntity> && entity != null)
+            {
+                await ((IExplicitLoadingEntityStore<TEntity>)store).ExplicitLoadAsync(entity, cancellationToken);
+            }
+
+            return entity;
         }
     }
 }
