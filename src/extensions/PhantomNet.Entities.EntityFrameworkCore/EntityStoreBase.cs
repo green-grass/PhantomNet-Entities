@@ -22,6 +22,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             }
 
             Context = context;
+            Context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public TContext Context { get; }
