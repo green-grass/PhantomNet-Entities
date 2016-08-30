@@ -12,15 +12,20 @@ namespace PhantomNet.Entities
                                ITimeTrackedEntityManager<TEntity>,
                                ICodeBasedEntityManager<TEntity>
     {
-        public IncrementalCodeGenerator(ICodeBasedEntityAccessor<TEntity> entityCodeAccessor, IOptions<IncrementalCodeGeneratorOptions> optionsAccessor)
+        public IncrementalCodeGenerator(ICodeBasedEntityAccessor<TEntity> entityCodeAccessor, IOptions<IncrementalCodeGeneratorOptions> incrementalCodeGeneratorOptions)
         {
             if (entityCodeAccessor == null)
             {
                 throw new ArgumentNullException(nameof(entityCodeAccessor));
             }
 
+            if (incrementalCodeGeneratorOptions == null)
+            {
+                throw new ArgumentNullException(nameof(incrementalCodeGeneratorOptions));
+            }
+
             EntityCodeAccessor = entityCodeAccessor;
-            Prefixes = optionsAccessor.Value.Prefixes ?? new Dictionary<Type, string>();
+            Prefixes = incrementalCodeGeneratorOptions.Value.Prefixes ?? new Dictionary<Type, string>();
         }
 
         public IDictionary<Type, string> Prefixes { get; }

@@ -9,11 +9,16 @@ namespace PhantomNet.Entities
         where TEntity : class
         where TEntityManager : class
     {
-        public UrlFriendlyCodeGenerator(INameBasedEntityAccessor<TEntity> entityNameAccessor, IOptions<UrlFriendlyCodeGeneratorOptions> optionsAccessor)
+        public UrlFriendlyCodeGenerator(INameBasedEntityAccessor<TEntity> entityNameAccessor, IOptions<UrlFriendlyCodeGeneratorOptions> urlFriendlyCodeGeneratorOptions)
         {
             if (entityNameAccessor == null)
             {
                 throw new ArgumentNullException(nameof(entityNameAccessor));
+            }
+
+            if (urlFriendlyCodeGeneratorOptions == null)
+            {
+                throw new ArgumentNullException(nameof(urlFriendlyCodeGeneratorOptions));
             }
 
             EntityNameAccessor = entityNameAccessor;
