@@ -6,7 +6,7 @@ namespace PhantomNet.Entities
         where TEntity : class
     {
         public int TotalCount { get; set; }
-        public int FilterredCount { get; set; }
+        public int FilteredCount { get; set; }
         public IQueryable<TEntity> Results { get; set; }
     }
 }

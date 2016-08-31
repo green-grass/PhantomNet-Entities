@@ -856,7 +856,7 @@ namespace PhantomNet.Entities
             result.TotalCount = await Count(entities);
 
             entities = Filter(entities, searchDescriptor);
-            result.FilterredCount = await Count(entities);
+            result.FilteredCount = await Count(entities);
 
             entities = Sort(entities, searchDescriptor);
 

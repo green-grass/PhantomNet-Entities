@@ -110,7 +110,7 @@ namespace PhantomNet.Entities.Mvc
             var result = await EntityManager.SearchAsync(searchDescriptor);
 
             Response.Headers["total-count"] = result.TotalCount.ToString();
-            Response.Headers["filtered-count"] = result.FilterredCount.ToString();
+            Response.Headers["filtered-count"] = result.FilteredCount.ToString();
             Response.Headers["token"] = token;
 
             var viewModels = Mapper.Map<IEnumerable<TViewModel>>(result.Results);
