@@ -566,15 +566,7 @@ namespace PhantomNet.Entities
 
         protected virtual Task PrepareEntityForCreating(TEntity entity)
         {
-            if (SupportsCodeBasedEntity)
-            {
-                NormalizeEntityCode(entity);
-            }
-
-            if (SupportsNameBasedEntity)
-            {
-                NormalizeEntityName(entity);
-            }
+            PrepareEntityForSaving(entity);
 
             if (SupportsTimeTrackedEntity)
             {
@@ -588,6 +580,18 @@ namespace PhantomNet.Entities
 
         protected virtual Task PrepareEntityForUpdating(TEntity entity)
         {
+            PrepareEntityForSaving(entity);
+
+            if (SupportsTimeTrackedEntity)
+            {
+                TimeTrackedEntityAccessor.SetDataLastModifyDate(entity, DateTime.Now);
+            }
+
+            return Task.FromResult(0);
+        }
+
+        protected virtual Task PrepareEntityForSaving(TEntity entity)
+        {
             if (SupportsCodeBasedEntity)
             {
                 NormalizeEntityCode(entity);
@@ -598,9 +602,9 @@ namespace PhantomNet.Entities
                 NormalizeEntityName(entity);
             }
 
-            if (SupportsTimeTrackedEntity)
+            if (SupportsTaggedEntity)
             {
-                TimeTrackedEntityAccessor.SetDataLastModifyDate(entity, DateTime.Now);
+                NormalizeEntityTags(entity);
             }
 
             return Task.FromResult(0);
@@ -1156,6 +1160,48 @@ namespace PhantomNet.Entities
         {
             var normalizedName = NormalizeEntityKey(NameBasedEntityAccessor.GetName(entity));
             NameBasedEntityAccessor.SetNormalizedName(entity, normalizedName);
+        }
+
+        #endregion
+    }
+
+    // TaggedEntity
+    partial class EntityManagerBase<TEntity, TEntityManager>
+    {
+        #region Properties
+
+        protected virtual bool SupportsTaggedEntity
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return Accessor is ITaggedEntityAccessor<TEntity>;
+            }
+        }
+
+        protected virtual ITaggedEntityAccessor<TEntity> TaggedEntityAccessor
+        {
+            get
+            {
+                var accessor = Accessor as ITaggedEntityAccessor<TEntity>;
+                if (accessor == null)
+                {
+                    // TODO:: Message
+                    throw new NotSupportedException();
+                }
+
+                return accessor;
+            }
+        }
+
+        #endregion
+
+        #region Helpers
+
+        protected virtual void NormalizeEntityTags(TEntity entity)
+        {
+            var normalizedTags = new TagProcessor().NormalizeTags(TaggedEntityAccessor.GetTags(entity));
+            TaggedEntityAccessor.SetTags(entity, normalizedTags);
         }
 
         #endregion
