@@ -2,6 +2,11 @@
 
 namespace PhantomNet.Entities
 {
+    public class UpperInvariantLookupNormalizer<T>
+        : UpperInvariantLookupNormalizer,
+          ILookupNormalizer<T>
+    { }
+
     public class UpperInvariantLookupNormalizer : ILookupNormalizer
     {
         public virtual string Normalize(string key)
