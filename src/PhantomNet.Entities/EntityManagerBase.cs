@@ -1003,9 +1003,9 @@ namespace PhantomNet.Entities
     {
         #region Properties
 
-        private ILookupNormalizer CodeNormalizer { get; }
+        protected ILookupNormalizer CodeNormalizer { get; }
 
-        private IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; }
+        protected IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; }
 
         protected virtual bool SupportsCodeBasedEntity
         {
@@ -1094,7 +1094,7 @@ namespace PhantomNet.Entities
     {
         #region Properties
 
-        private ILookupNormalizer NameNormalizer { get; }
+        protected ILookupNormalizer NameNormalizer { get; }
 
         protected virtual bool SupportsNameBasedEntity
         {
