@@ -19,12 +19,11 @@ namespace PhantomNet.Entities
         #region Constructors
 
         protected EntityManagerBase(
-            IDisposable store, object entityAccessor,
+            IDisposable store,
+            object entityAccessor,
             IEnumerable<IEntityValidator<TEntity, TSubEntity, TEntityManager>> entityValidators,
-            ILookupNormalizer keyNormalizer,
-            IEntityCodeGenerator<TEntity, TEntityManager> codeGenerator,
             ILogger<EntityManagerBase<TEntity, TSubEntity, TEntityManager>> logger)
-            : base(store, entityAccessor, entityValidators, keyNormalizer, codeGenerator, logger)
+            : base(store, entityAccessor, entityValidators, logger)
         {
             if (entityValidators != null)
             {
@@ -342,7 +341,7 @@ namespace PhantomNet.Entities
                 throw new ArgumentNullException(nameof(name));
             }
 
-            return ScopedNameBasedStore.FindByNameAsync(NormalizeEntityKey(name), scope, CancellationToken);
+            return ScopedNameBasedStore.FindByNameAsync(NormalizeEntityName(name), scope, CancellationToken);
         }
 
         #endregion
@@ -357,7 +356,7 @@ namespace PhantomNet.Entities
                 return;
             }
 
-            var normalizedName = NormalizeEntityKey(ScopedNameBasedEntityAccessor.GetName(entity));
+            var normalizedName = NormalizeEntityName(ScopedNameBasedEntityAccessor.GetName(entity));
             ScopedNameBasedEntityAccessor.SetNormalizedName(entity, normalizedName);
         }
 
@@ -419,10 +418,9 @@ namespace PhantomNet.Entities
         #region Constructors
 
         protected EntityManagerBase(
-            IDisposable store, object entityAccessor,
+            IDisposable store,
+            object entityAccessor,
             IEnumerable<IEntityValidator<TEntity, TEntityManager>> entityValidators,
-            ILookupNormalizer keyNormalizer,
-            IEntityCodeGenerator<TEntity, TEntityManager> codeGenerator,
             ILogger<EntityManagerBase<TEntity, TEntityManager>> logger)
         {
             if (!(this is TEntityManager))
@@ -440,8 +438,6 @@ namespace PhantomNet.Entities
 
             Store = store;
             Accessor = entityAccessor;
-            KeyNormalizer = keyNormalizer;
-            CodeGenerator = codeGenerator;
             Logger = logger;
 
             if (entityValidators != null)
@@ -459,10 +455,6 @@ namespace PhantomNet.Entities
 
         private IList<IEntityValidator<TEntity, TEntityManager>> EntityValidators { get; }
             = new List<IEntityValidator<TEntity, TEntityManager>>();
-
-        private ILookupNormalizer KeyNormalizer { get; }
-
-        private IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; }
 
         protected virtual CancellationToken CancellationToken => CancellationToken.None;
 
@@ -547,11 +539,6 @@ namespace PhantomNet.Entities
         #endregion
 
         #region Helpers
-
-        protected virtual string NormalizeEntityKey(string key)
-        {
-            return (KeyNormalizer == null) ? key : KeyNormalizer.Normalize(key);
-        }
 
         protected virtual async Task PrepareEntityForValidation(TEntity entity)
         {
@@ -1016,6 +1003,10 @@ namespace PhantomNet.Entities
     {
         #region Properties
 
+        private ILookupNormalizer CodeNormalizer { get; }
+
+        private IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; }
+
         protected virtual bool SupportsCodeBasedEntity
         {
             get
@@ -1067,16 +1058,21 @@ namespace PhantomNet.Entities
                 throw new ArgumentNullException(nameof(code));
             }
 
-            return CodeBasedEntityStore.FindByCodeAsync(NormalizeEntityKey(code), CancellationToken);
+            return CodeBasedEntityStore.FindByCodeAsync(NormalizeEntityCode(code), CancellationToken);
         }
 
         #endregion
 
         #region Helpers
 
+        protected virtual string NormalizeEntityCode(string code)
+        {
+            return (CodeNormalizer == null) ? code : CodeNormalizer.Normalize(code);
+        }
+
         protected virtual void NormalizeEntityCode(TEntity entity)
         {
-            var normalizedCode = NormalizeEntityKey(CodeBasedEntityAccessor.GetCode(entity));
+            var normalizedCode = NormalizeEntityCode(CodeBasedEntityAccessor.GetCode(entity));
             CodeBasedEntityAccessor.SetCode(entity, normalizedCode);
         }
 
@@ -1097,6 +1093,8 @@ namespace PhantomNet.Entities
     partial class EntityManagerBase<TEntity, TEntityManager>
     {
         #region Properties
+
+        private ILookupNormalizer NameNormalizer { get; }
 
         protected virtual bool SupportsNameBasedEntity
         {
@@ -1149,16 +1147,21 @@ namespace PhantomNet.Entities
                 throw new ArgumentNullException(nameof(name));
             }
 
-            return NameBasedEntityStore.FindByNameAsync(NormalizeEntityKey(name), CancellationToken);
+            return NameBasedEntityStore.FindByNameAsync(NormalizeEntityName(name), CancellationToken);
         }
 
         #endregion
 
         #region Helpers
 
+        protected virtual string NormalizeEntityName(string name)
+        {
+            return (NameNormalizer == null) ? name : NameNormalizer.Normalize(name);
+        }
+
         protected virtual void NormalizeEntityName(TEntity entity)
         {
-            var normalizedName = NormalizeEntityKey(NameBasedEntityAccessor.GetName(entity));
+            var normalizedName = NormalizeEntityName(NameBasedEntityAccessor.GetName(entity));
             NameBasedEntityAccessor.SetNormalizedName(entity, normalizedName);
         }
 
@@ -1169,6 +1172,8 @@ namespace PhantomNet.Entities
     partial class EntityManagerBase<TEntity, TEntityManager>
     {
         #region Properties
+
+        protected virtual ITagProcessor TagProcessor { get; set; }
 
         protected virtual bool SupportsTaggedEntity
         {
@@ -1200,7 +1205,8 @@ namespace PhantomNet.Entities
 
         protected virtual void NormalizeEntityTags(TEntity entity)
         {
-            var normalizedTags = new TagProcessor().NormalizeTags(TaggedEntityAccessor.GetTags(entity));
+            var tags = TaggedEntityAccessor.GetTags(entity);
+            var normalizedTags = (TagProcessor == null) ? tags : TagProcessor.NormalizeTags(tags);
             TaggedEntityAccessor.SetTags(entity, normalizedTags);
         }
 
