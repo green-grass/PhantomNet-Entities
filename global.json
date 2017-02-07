@@ -1,10 +1,10 @@
 ﻿{
-  "projects": [
-    "src",
-    "test",
-    "src/extensions"
-  ],
-  "sdk": {
-    "version": "1.0.0-preview2-003121"
-  }
+    "projects": [
+        "src",
+        "test",
+        "src/extensions"
+    ],
+    "sdk": {
+        "version": "1.0.0-preview2-003131"
+    }
 }

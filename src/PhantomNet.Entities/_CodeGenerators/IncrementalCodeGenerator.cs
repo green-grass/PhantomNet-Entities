@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -12,7 +11,9 @@ namespace PhantomNet.Entities
                                ITimeTrackedEntityManager<TEntity>,
                                ICodeBasedEntityManager<TEntity>
     {
-        public IncrementalCodeGenerator(ICodeBasedEntityAccessor<TEntity> entityCodeAccessor, IOptions<IncrementalCodeGeneratorOptions> incrementalCodeGeneratorOptions)
+        public IncrementalCodeGenerator(
+            ICodeBasedEntityAccessor<TEntity> entityCodeAccessor,
+            IOptions<IncrementalCodeGeneratorOptions<TEntity>> incrementalCodeGeneratorOptions)
         {
             if (entityCodeAccessor == null)
             {
@@ -25,10 +26,10 @@ namespace PhantomNet.Entities
             }
 
             EntityCodeAccessor = entityCodeAccessor;
-            Prefixes = incrementalCodeGeneratorOptions.Value.Prefixes ?? new Dictionary<Type, string>();
+            Prefix = incrementalCodeGeneratorOptions.Value.Prefix ?? string.Empty;
         }
 
-        public IDictionary<Type, string> Prefixes { get; }
+        public string Prefix { get; }
 
         protected ICodeBasedEntityAccessor<TEntity> EntityCodeAccessor { get; }
 
@@ -36,16 +37,15 @@ namespace PhantomNet.Entities
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var prefix = Prefixes[typeof(TEntity)] ?? string.Empty;
             var latestEntity = await manager.FindLatestAsync();
             if (latestEntity == null)
             {
-                return $"{prefix}1";
+                return $"{Prefix}1";
             }
 
             var latestCode = EntityCodeAccessor.GetCode(latestEntity);
-            var latestNumber = int.Parse(latestCode.Substring(prefix.Length));
-            return $"{prefix}{latestNumber + 1}";
+            var latestNumber = int.Parse(latestCode.Substring(Prefix.Length));
+            return $"{Prefix}{latestNumber + 1}";
         }
     }
 }

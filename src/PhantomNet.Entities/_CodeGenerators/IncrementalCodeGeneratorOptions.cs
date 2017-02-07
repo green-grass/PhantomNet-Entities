@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PhantomNet.Entities
+﻿namespace PhantomNet.Entities
 {
-    public class IncrementalCodeGeneratorOptions
+    public class IncrementalCodeGeneratorOptions<TEntity>
+        where TEntity : class
     {
-        public IDictionary<Type, string> Prefixes { get; set; } = new Dictionary<Type, string>();
+        public string Prefix { get; set; }
     }
 }

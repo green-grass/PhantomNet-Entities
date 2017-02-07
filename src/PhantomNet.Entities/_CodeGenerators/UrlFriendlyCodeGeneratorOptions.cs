@@ -1,4 +1,6 @@
 ﻿namespace PhantomNet.Entities
 {
-    public class UrlFriendlyCodeGeneratorOptions { }
+    public class UrlFriendlyCodeGeneratorOptions<TEntity>
+        where TEntity : class
+    { }
 }
