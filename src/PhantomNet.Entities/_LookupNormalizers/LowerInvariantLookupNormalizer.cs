@@ -2,9 +2,9 @@
 
 namespace PhantomNet.Entities
 {
-    public class LowerInvariantLookupNormalizer<T>
+    public class LowerInvariantLookupNormalizer<TMarker>
         : LowerInvariantLookupNormalizer,
-          ILookupNormalizer<T>
+          ILookupNormalizer<TMarker>
     { }
 
     public class LowerInvariantLookupNormalizer : ILookupNormalizer

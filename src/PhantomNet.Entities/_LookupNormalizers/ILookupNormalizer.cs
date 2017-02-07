@@ -1,6 +1,6 @@
 ﻿namespace PhantomNet.Entities
 {
-    public interface ILookupNormalizer<T> : ILookupNormalizer { }
+    public interface ILookupNormalizer<TMarker> : ILookupNormalizer { }
 
     public interface ILookupNormalizer
     {
