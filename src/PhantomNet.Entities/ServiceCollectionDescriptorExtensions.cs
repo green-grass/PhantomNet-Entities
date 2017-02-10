@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using PhantomNet.Entities;
 
 namespace Microsoft.Extensions.DependencyInjection.Extensions
@@ -66,7 +67,14 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             managerTypeArguments.Insert(0, typeof(TEntity));
             var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
             var service = typeof(IEntityValidator<,>).MakeGenericType(typeof(TEntity), managerService);
-            var implementationType = validatorType.MakeGenericType(typeof(TEntity), managerService);
+            var validatorTypeArguments = managerTypeArguments.ToList();
+            // Remove module marker
+            if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == managerType.GetTypeInfo().GenericTypeParameters.Count())
+            {
+                validatorTypeArguments.RemoveAt(validatorTypeArguments.Count - 1);
+            }
+            validatorTypeArguments.Add(managerService);
+            var implementationType = validatorType.MakeGenericType(validatorTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
@@ -89,7 +97,14 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             managerTypeArguments.Insert(0, typeof(TEntity));
             var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
             var service = typeof(IEntityValidator<,,>).MakeGenericType(typeof(TEntity), typeof(TSubEntity), managerService);
-            var implementationType = validatorType.MakeGenericType(typeof(TEntity), managerService);
+            var validatorTypeArguments = managerTypeArguments.ToList();
+            // Remove module marker
+            if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == managerType.GetTypeInfo().GenericTypeParameters.Count())
+            {
+                validatorTypeArguments.RemoveAt(validatorTypeArguments.Count - 1);
+            }
+            validatorTypeArguments.Add(managerService);
+            var implementationType = validatorType.MakeGenericType(validatorTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
