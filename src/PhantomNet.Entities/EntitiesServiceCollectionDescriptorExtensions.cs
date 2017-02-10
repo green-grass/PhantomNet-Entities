@@ -311,7 +311,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             Type entityType,
             Type storeServiceType,
             Type storeImplementationType, Type storeWithKeyTypeImplementationType, Type[] storeImplementationTypeArguments,
-            Type keyType,
+            Type keyType, int keyTypeIndex,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -341,10 +341,11 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             var serviceTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
             var service = storeServiceType.MakeGenericType(serviceTypeArguments);
-            var storeWithKeyTypeImplementationTypeArguments = storeImplementationTypeArguments.Concat(new Type[] { keyType }).ToArray();
+            var storeWithKeyTypeImplementationTypeArguments = storeImplementationTypeArguments.ToList();
+            storeWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
             var implementationType = keyType == null ?
                 storeImplementationType.MakeGenericType(storeImplementationTypeArguments) :
-                storeWithKeyTypeImplementationType.MakeGenericType(storeWithKeyTypeImplementationTypeArguments);
+                storeWithKeyTypeImplementationType.MakeGenericType(storeWithKeyTypeImplementationTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
@@ -359,7 +360,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             Type entityType,
             Type accessorServiceType,
             Type accessorImplementationType, Type accessorWithKeyTypeImplementationType, Type[] accessorImplementationTypeArguments,
-            Type keyType,
+            Type keyType, int keyTypeIndex,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -389,10 +390,11 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             var serviceTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
             var service = accessorServiceType.MakeGenericType(serviceTypeArguments);
-            var accessorWithKeyTypeImplementationTypeArguments = accessorImplementationTypeArguments.Concat(new Type[] { keyType }).ToArray();
+            var accessorWithKeyTypeImplementationTypeArguments = accessorImplementationTypeArguments.ToList();
+            accessorWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
             var implementationType = keyType == null ?
                 accessorImplementationType.MakeGenericType(accessorImplementationTypeArguments) :
-                accessorWithKeyTypeImplementationType.MakeGenericType(accessorWithKeyTypeImplementationTypeArguments);
+                accessorWithKeyTypeImplementationType.MakeGenericType(accessorWithKeyTypeImplementationTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
