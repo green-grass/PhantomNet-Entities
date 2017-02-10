@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Linq;
 using PhantomNet.Entities;
 
 namespace Microsoft.Extensions.DependencyInjection.Extensions
 {
     public static class EntitiesServiceCollectionDescriptorExtensions
     {
-        // Manager
+        #region Manager
 
         public static IServiceCollection AddManager<TEntity>(this IServiceCollection services,
-            Type managerType)
+            Type managerType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
         {
             if (services == null)
@@ -16,14 +18,18 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var service = managerType.MakeGenericType(typeof(TEntity));
+            var managerTypeArguments = managerAdditionalTypeArguments.ToList();
+            managerTypeArguments.Insert(0, typeof(TEntity));
+            var service = managerType.MakeGenericType(managerTypeArguments.ToArray());
 
             services.TryAddScoped(service);
 
             return services;
         }
+
         public static IServiceCollection AddManager<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType)
+            Type managerType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
@@ -32,17 +38,23 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var service = managerType.MakeGenericType(typeof(TEntity), typeof(TSubEntity));
+            var managerTypeArguments = managerAdditionalTypeArguments.ToList();
+            managerTypeArguments.Insert(0, typeof(TSubEntity));
+            managerTypeArguments.Insert(0, typeof(TEntity));
+            var service = managerType.MakeGenericType(managerTypeArguments.ToArray());
 
             services.TryAddScoped(service);
 
             return services;
         }
 
-        // Validator
+        #endregion
+
+        #region Validator
 
         public static IServiceCollection AddValidator<TEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType)
+            Type managerType, Type validatorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
         {
             if (services == null)
@@ -50,7 +62,9 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var managerService = managerType.MakeGenericType(typeof(TEntity));
+            var managerTypeArguments = managerAdditionalTypeArguments.ToList();
+            managerTypeArguments.Insert(0, typeof(TEntity));
+            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
             var service = typeof(IEntityValidator<,>).MakeGenericType(typeof(TEntity), managerService);
             var implementationType = validatorType.MakeGenericType(typeof(TEntity), managerService);
 
@@ -60,7 +74,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
         }
 
         public static IServiceCollection AddValidator<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType)
+            Type managerType, Type validatorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
@@ -69,7 +84,10 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var managerService = managerType.MakeGenericType(typeof(TEntity), typeof(TSubEntity));
+            var managerTypeArguments = managerAdditionalTypeArguments.ToList();
+            managerTypeArguments.Insert(0, typeof(TSubEntity));
+            managerTypeArguments.Insert(0, typeof(TEntity));
+            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
             var service = typeof(IEntityValidator<,,>).MakeGenericType(typeof(TEntity), typeof(TSubEntity), managerService);
             var implementationType = validatorType.MakeGenericType(typeof(TEntity), managerService);
 
@@ -78,7 +96,9 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return services;
         }
 
-        // LookupNormalizer
+        #endregion
+
+        #region LookupNormalizer
 
         public static IServiceCollection AddLookupNormalizer<TEntity>(this IServiceCollection services,
             Type lookupNormalizerType)
@@ -97,10 +117,13 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return services;
         }
 
-        // CodeGenerator
+        #endregion
+
+        #region CodeGenerator
 
         public static IServiceCollection AddCodeGenerator<TEntity>(this IServiceCollection services,
-            Type managerType, Type codeGeneratorType)
+            Type managerType, Type codeGeneratorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
         {
             if (services == null)
@@ -108,7 +131,9 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var managerService = managerType.MakeGenericType(typeof(TEntity));
+            var managerTypeArguments = managerAdditionalTypeArguments.ToList();
+            managerTypeArguments.Insert(0, typeof(TEntity));
+            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
             var service = typeof(IEntityCodeGenerator<,>).MakeGenericType(typeof(TEntity), managerService);
             var implementationType = codeGeneratorType.MakeGenericType(typeof(TEntity), managerService);
 
@@ -118,7 +143,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
         }
 
         public static IServiceCollection AddCodeGenerator<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType, Type codeGeneratorType)
+            Type managerType, Type codeGeneratorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
@@ -127,7 +153,10 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var managerService = managerType.MakeGenericType(typeof(TEntity), typeof(TSubEntity));
+            var managerTypeArguments = managerAdditionalTypeArguments.ToList();
+            managerTypeArguments.Insert(0, typeof(TSubEntity));
+            managerTypeArguments.Insert(0, typeof(TEntity));
+            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
             var service = typeof(IEntityCodeGenerator<,>).MakeGenericType(typeof(TEntity), managerService);
             var implementationType = codeGeneratorType.MakeGenericType(typeof(TEntity), managerService);
 
@@ -136,38 +165,44 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return services;
         }
 
-        // Entity
+        #endregion
+
+        #region Entity
 
         public static IServiceCollection AddEntity<TEntity>(this IServiceCollection services,
-            Type managerType)
+            Type managerType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
         {
-            return AddEntity<TEntity>(services, managerType, null, null, null);
+            return AddEntity<TEntity>(services, managerType, null, null, null, managerAdditionalTypeArguments);
         }
 
         public static IServiceCollection AddEntity<TEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType)
+            Type managerType, Type validatorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
         {
-            return AddEntity<TEntity>(services, managerType, validatorType, null, null);
+            return AddEntity<TEntity>(services, managerType, validatorType, null, null, managerAdditionalTypeArguments);
         }
 
         public static IServiceCollection AddEntity<TEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType, Type lookupNormalizerType)
+            Type managerType, Type validatorType, Type lookupNormalizerType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
         {
-            return AddEntity<TEntity>(services, managerType, validatorType, lookupNormalizerType, null);
+            return AddEntity<TEntity>(services, managerType, validatorType, lookupNormalizerType, null, managerAdditionalTypeArguments);
         }
 
         public static IServiceCollection AddEntity<TEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType)
+            Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
         {
-            services = AddManager<TEntity>(services, managerType);
+            services = AddManager<TEntity>(services, managerType, managerAdditionalTypeArguments);
 
             if (validatorType != null)
             {
-                services = AddValidator<TEntity>(services, managerType, validatorType);
+                services = AddValidator<TEntity>(services, managerType, validatorType, managerAdditionalTypeArguments);
             }
 
             if (lookupNormalizerType != null)
@@ -177,46 +212,50 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             if (codeGeneratorType != null)
             {
-                services = AddCodeGenerator<TEntity>(services, managerType, codeGeneratorType);
+                services = AddCodeGenerator<TEntity>(services, managerType, codeGeneratorType, managerAdditionalTypeArguments);
             }
 
             return services;
         }
 
         public static IServiceCollection AddEntity<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType)
+            Type managerType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
-            return AddEntity<TEntity, TSubEntity>(services, managerType, null, null, null);
+            return AddEntity<TEntity, TSubEntity>(services, managerType, null, null, null, managerAdditionalTypeArguments);
         }
 
         public static IServiceCollection AddEntity<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType)
+            Type managerType, Type validatorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
-            return AddEntity<TEntity, TSubEntity>(services, managerType, validatorType, null, null);
+            return AddEntity<TEntity, TSubEntity>(services, managerType, validatorType, null, null, managerAdditionalTypeArguments);
         }
 
         public static IServiceCollection AddEntity<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType, Type lookupNormalizerType)
+            Type managerType, Type validatorType, Type lookupNormalizerType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
-            return AddEntity<TEntity, TSubEntity>(services, managerType, validatorType, lookupNormalizerType, null);
+            return AddEntity<TEntity, TSubEntity>(services, managerType, validatorType, lookupNormalizerType, null, managerAdditionalTypeArguments);
         }
 
         public static IServiceCollection AddEntity<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType)
+            Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType,
+            params Type[] managerAdditionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
-            services = AddManager<TEntity, TSubEntity>(services, managerType);
+            services = AddManager<TEntity, TSubEntity>(services, managerType, managerAdditionalTypeArguments);
 
             if (validatorType != null)
             {
-                services = AddValidator<TEntity, TSubEntity>(services, managerType, validatorType);
+                services = AddValidator<TEntity, TSubEntity>(services, managerType, validatorType, managerAdditionalTypeArguments);
             }
 
             if (lookupNormalizerType != null)
@@ -226,10 +265,12 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             if (codeGeneratorType != null)
             {
-                services = AddCodeGenerator<TEntity, TSubEntity>(services, managerType, codeGeneratorType);
+                services = AddCodeGenerator<TEntity, TSubEntity>(services, managerType, codeGeneratorType, managerAdditionalTypeArguments);
             }
 
             return services;
         }
+
+        #endregion
     }
 }
