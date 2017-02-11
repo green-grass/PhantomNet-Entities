@@ -483,7 +483,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             catch (ArgumentException e)
             {
                 if (e.ParamName == "instantiation" &&
-                    e.Message == "The number of generic arguments provided doesn't equal the arity of the generic type definition.")
+                    e.Message.StartsWith("The number of generic arguments provided doesn't equal the arity of the generic type definition."))
                 {
                     throw new ArgumentException($"The number of generic arguments ({string.Join(", ", typeArguments.Select(x => x.Name))}) doesn't equal the arity of the generic type definition ({genericType.Name}).", e);
                 }
