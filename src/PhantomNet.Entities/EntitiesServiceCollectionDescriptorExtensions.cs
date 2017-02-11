@@ -44,7 +44,21 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var service = managerType.MakeGenericType(managerTypeArguments.ToArray());
+            Type service;
+
+            try
+            {
+                service = managerType.MakeGenericType(managerTypeArguments);
+            }
+            catch (ArgumentException e)
+            {
+                if (e.ParamName == "instantiation" &&
+                    e.Message == "The number of generic arguments provided doesn't equal the arity of the generic type definition.")
+                {
+                    throw new ArgumentException($"The number of generic arguments ({string.Join(", ", managerTypeArguments.Select(x => x.Name))}) doesn't equal the arity of the generic type definition ({managerType.Name}).", e);
+                }
+                throw e;
+            }
 
             services.TryAddScoped(service);
 
@@ -73,7 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
-            var service = managerType.MakeGenericType(managerTypeArguments.ToArray());
+            var service = managerType.MakeGenericType(managerTypeArguments);
 
             services.TryAddScoped(service);
 
@@ -123,7 +137,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
+            var managerService = managerType.MakeGenericType(managerTypeArguments);
             var service = typeof(IEntityValidator<,>).MakeGenericType(entityType, managerService);
             var validatorTypeArguments = managerTypeArguments.ToList();
             // Remove module marker
@@ -165,7 +179,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
+            var managerService = managerType.MakeGenericType(managerTypeArguments);
             var service = typeof(IEntityValidator<,,>).MakeGenericType(entityType, subEntityType, managerService);
             var validatorTypeArguments = managerTypeArguments.ToList();
             // Remove module marker
@@ -259,7 +273,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
+            var managerService = managerType.MakeGenericType(managerTypeArguments);
             var service = typeof(IEntityCodeGenerator<,>).MakeGenericType(entityType, managerService);
             var implementationType = codeGeneratorType.MakeGenericType(entityType, managerService);
 
@@ -294,7 +308,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments.ToArray());
+            var managerService = managerType.MakeGenericType(managerTypeArguments);
             var service = typeof(IEntityCodeGenerator<,>).MakeGenericType(entityType, managerService);
             var implementationType = codeGeneratorType.MakeGenericType(entityType, managerService);
 
