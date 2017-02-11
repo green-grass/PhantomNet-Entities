@@ -44,21 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            Type service;
-
-            try
-            {
-                service = managerType.MakeGenericType(managerTypeArguments);
-            }
-            catch (ArgumentException e)
-            {
-                if (e.ParamName == "instantiation" &&
-                    e.Message == "The number of generic arguments provided doesn't equal the arity of the generic type definition.")
-                {
-                    throw new ArgumentException($"The number of generic arguments ({string.Join(", ", managerTypeArguments.Select(x => x.Name))}) doesn't equal the arity of the generic type definition ({managerType.Name}).", e);
-                }
-                throw e;
-            }
+            var service = TryMakeGenericType(managerType, managerTypeArguments);
 
             services.TryAddScoped(service);
 
@@ -87,7 +73,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
-            var service = managerType.MakeGenericType(managerTypeArguments);
+            var service = TryMakeGenericType(managerType, managerTypeArguments);
 
             services.TryAddScoped(service);
 
@@ -137,8 +123,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments);
-            var service = typeof(IEntityValidator<,>).MakeGenericType(entityType, managerService);
+            var managerService = TryMakeGenericType(managerType, managerTypeArguments);
+            var service = TryMakeGenericType(typeof(IEntityValidator<,>), entityType, managerService);
             var validatorTypeArguments = managerTypeArguments.ToList();
             // Remove module marker
             if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == managerType.GetTypeInfo().GenericTypeParameters.Count())
@@ -146,7 +132,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 validatorTypeArguments.RemoveAt(validatorTypeArguments.Count - 1);
             }
             validatorTypeArguments.Add(managerService);
-            var implementationType = validatorType.MakeGenericType(validatorTypeArguments.ToArray());
+            var implementationType = TryMakeGenericType(validatorType, validatorTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
@@ -179,8 +165,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments);
-            var service = typeof(IEntityValidator<,,>).MakeGenericType(entityType, subEntityType, managerService);
+            var managerService = TryMakeGenericType(managerType, managerTypeArguments);
+            var service = TryMakeGenericType(typeof(IEntityValidator<,,>), entityType, subEntityType, managerService);
             var validatorTypeArguments = managerTypeArguments.ToList();
             // Remove module marker
             if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == managerType.GetTypeInfo().GenericTypeParameters.Count())
@@ -188,7 +174,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 validatorTypeArguments.RemoveAt(validatorTypeArguments.Count - 1);
             }
             validatorTypeArguments.Add(managerService);
-            var implementationType = validatorType.MakeGenericType(validatorTypeArguments.ToArray());
+            var implementationType = TryMakeGenericType(validatorType, validatorTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
@@ -222,8 +208,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
                 throw new ArgumentNullException(nameof(lookupNormalizerType));
             }
 
-            var service = typeof(ILookupNormalizer<>).MakeGenericType(entityType);
-            var implementationType = lookupNormalizerType.MakeGenericType(entityType);
+            var service = TryMakeGenericType(typeof(ILookupNormalizer<>), entityType);
+            var implementationType = TryMakeGenericType(lookupNormalizerType, entityType);
 
             services.TryAddScoped(service, implementationType);
 
@@ -273,9 +259,9 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments);
-            var service = typeof(IEntityCodeGenerator<,>).MakeGenericType(entityType, managerService);
-            var implementationType = codeGeneratorType.MakeGenericType(entityType, managerService);
+            var managerService = TryMakeGenericType(managerType, managerTypeArguments);
+            var service = TryMakeGenericType(typeof(IEntityCodeGenerator<,>), entityType, managerService);
+            var implementationType = TryMakeGenericType(codeGeneratorType, entityType, managerService);
 
             services.TryAddScoped(service, implementationType);
 
@@ -308,9 +294,9 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = managerType.MakeGenericType(managerTypeArguments);
-            var service = typeof(IEntityCodeGenerator<,>).MakeGenericType(entityType, managerService);
-            var implementationType = codeGeneratorType.MakeGenericType(entityType, managerService);
+            var managerService = TryMakeGenericType(managerType, managerTypeArguments);
+            var service = TryMakeGenericType(typeof(IEntityCodeGenerator<,>), entityType, managerService);
+            var implementationType = TryMakeGenericType(codeGeneratorType, entityType, managerService);
 
             services.TryAddScoped(service, implementationType);
 
@@ -354,12 +340,12 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var serviceTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var service = storeServiceType.MakeGenericType(serviceTypeArguments);
+            var service = TryMakeGenericType(storeServiceType, serviceTypeArguments);
             var storeWithKeyTypeImplementationTypeArguments = storeImplementationTypeArguments.ToList();
             storeWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
             var implementationType = keyType == null ?
-                storeImplementationType.MakeGenericType(storeImplementationTypeArguments) :
-                storeWithKeyTypeImplementationType.MakeGenericType(storeWithKeyTypeImplementationTypeArguments.ToArray());
+                TryMakeGenericType(storeImplementationType, storeImplementationTypeArguments) :
+                TryMakeGenericType(storeWithKeyTypeImplementationType, storeWithKeyTypeImplementationTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
@@ -403,12 +389,12 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             var serviceTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var service = accessorServiceType.MakeGenericType(serviceTypeArguments);
+            var service = TryMakeGenericType(accessorServiceType, serviceTypeArguments);
             var accessorWithKeyTypeImplementationTypeArguments = accessorImplementationTypeArguments.ToList();
             accessorWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
             var implementationType = keyType == null ?
-                accessorImplementationType.MakeGenericType(accessorImplementationTypeArguments) :
-                accessorWithKeyTypeImplementationType.MakeGenericType(accessorWithKeyTypeImplementationTypeArguments.ToArray());
+                TryMakeGenericType(accessorImplementationType, accessorImplementationTypeArguments) :
+                TryMakeGenericType(accessorWithKeyTypeImplementationType, accessorWithKeyTypeImplementationTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
 
@@ -482,6 +468,27 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             }
 
             return services;
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private static Type TryMakeGenericType(Type genericType, params Type[] typeArguments)
+        {
+            try
+            {
+                return genericType.MakeGenericType(typeArguments);
+            }
+            catch (ArgumentException e)
+            {
+                if (e.ParamName == "instantiation" &&
+                    e.Message == "The number of generic arguments provided doesn't equal the arity of the generic type definition.")
+                {
+                    throw new ArgumentException($"The number of generic arguments ({string.Join(", ", typeArguments.Select(x => x.Name))}) doesn't equal the arity of the generic type definition ({genericType.Name}).", e);
+                }
+                throw e;
+            }
         }
 
         #endregion
