@@ -476,6 +476,11 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
         private static Type TryMakeGenericType(Type genericType, params Type[] typeArguments)
         {
+            if (!genericType.GetTypeInfo().IsGenericTypeDefinition)
+            {
+                return genericType;
+            }
+
             try
             {
                 return genericType.MakeGenericType(typeArguments);
