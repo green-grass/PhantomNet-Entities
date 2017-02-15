@@ -33,10 +33,10 @@ namespace PhantomNet.Entities.Mvc
         public virtual dynamic Resources()
         {
             return new {
-                CreateError = Localizer["CreateError"].ToString(),
-                UpdateError = Localizer["UpdateError"].ToString(),
-                DeleteConfirmation = Localizer["DeleteConfirmation"].ToString(),
-                DeleteError = Localizer["DeleteError"].ToString()
+                CreateError = Localizer["CreateError"].Value,
+                UpdateError = Localizer["UpdateError"].Value,
+                DeleteConfirmation = Localizer["DeleteConfirmation"].Value,
+                DeleteError = Localizer["DeleteError"].Value
             };
         }
 
