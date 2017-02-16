@@ -178,8 +178,15 @@ namespace PhantomNet.Entities.Mvc
             }
             catch (Exception e)
             {
+                var errors = new List<GenericError>();
+                do
+                {
+                    errors.Add(new GenericError { Code = e.Source, Description = e.Message });
+                    e = e.InnerException;
+                } while (e != null);
+
                 return new {
-                    Result = GenericResult.Failed(new GenericError { Description = e.Message })
+                    Result = GenericResult.Failed(errors.ToArray())
                 };
             }
         }
@@ -207,8 +214,15 @@ namespace PhantomNet.Entities.Mvc
             }
             catch (Exception e)
             {
+                var errors = new List<GenericError>();
+                do
+                {
+                    errors.Add(new GenericError { Code = e.Source, Description = e.Message });
+                    e = e.InnerException;
+                } while (e != null);
+
                 return new {
-                    Result = GenericResult.Failed(new GenericError { Description = e.Message })
+                    Result = GenericResult.Failed(errors.ToArray())
                 };
             }
         }
@@ -232,8 +246,15 @@ namespace PhantomNet.Entities.Mvc
             }
             catch (Exception e)
             {
+                var errors = new List<GenericError>();
+                do
+                {
+                    errors.Add(new GenericError { Code = e.Source, Description = e.Message });
+                    e = e.InnerException;
+                } while (e != null);
+
                 return new {
-                    Result = GenericResult.Failed(new GenericError { Description = e.Message })
+                    Result = GenericResult.Failed(errors.ToArray())
                 };
             }
         }
