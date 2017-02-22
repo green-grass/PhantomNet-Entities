@@ -231,6 +231,8 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(entity));
             }
 
+            await store.PrepareEntityForSaving(entity);
+
             store.Context.Add(entity);
 
             await store.SaveChangesAsync(cancellationToken);
@@ -409,6 +411,8 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             {
                 throw new ArgumentNullException(nameof(entity));
             }
+
+            await store.PrepareEntityForSaving(entity);
 
             store.Context.Attach(entity);
 

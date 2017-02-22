@@ -41,6 +41,8 @@ namespace PhantomNet.Entities.EntityFrameworkCore
 
         Task SaveChangesAsync(CancellationToken cancellationToken);
 
+        Task PrepareEntityForSaving(TEntity entity);
+
         void ThrowIfDisposed();
     }
 }

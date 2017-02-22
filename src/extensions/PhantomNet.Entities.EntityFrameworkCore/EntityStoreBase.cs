@@ -37,6 +37,11 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             }
         }
 
+        public virtual Task PrepareEntityForSaving(TEntity entity)
+        {
+            return Task.FromResult(0);
+        }
+
         protected void UpdateManyToMany<TSubEntity, TRelationship>(
             TEntity entity,
             IQueryable<TRelationship> relationships,
