@@ -6,7 +6,7 @@ namespace PhantomNet.Entities
 {
     public static class CodeBasedEntityValidatorExtensions
     {
-        public static async Task ValidateCode<TEntity, TEntityManager, TEntityAccessor>(this IEntityValidator<TEntity, TEntityManager> validator,
+        public static async Task ValidateCodeAsync<TEntity, TEntityManager, TEntityAccessor>(this IEntityValidator<TEntity, TEntityManager> validator,
             TEntityManager manager, TEntityAccessor entityAccessor, TEntity entity, List<GenericError> errors,
             Func<string, GenericError> invalidCode, Func<string, GenericError> duplicateCode)
             where TEntity: class

@@ -6,7 +6,7 @@ namespace PhantomNet.Entities
 {
     public static class NameBasedEntityValidatorExtensions
     {
-        public static async Task ValidateName<TEntity, TEntityManager, TEntityAccessor>(this IEntityValidator<TEntity, TEntityManager> validator,
+        public static async Task ValidateNameAsync<TEntity, TEntityManager, TEntityAccessor>(this IEntityValidator<TEntity, TEntityManager> validator,
             TEntityManager manager, TEntityAccessor entityAccessor, TEntity entity, List<GenericError> errors,
             Func<string, GenericError> invalidName, Func<string, GenericError> duplicateName)
             where TEntity: class

@@ -72,6 +72,10 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             where TEntity : class
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (entities == null)
+            {
+                throw new ArgumentNullException(nameof(entities));
+            }
 
             if (store is IEagerLoadingEntityStore<TEntity>)
             {

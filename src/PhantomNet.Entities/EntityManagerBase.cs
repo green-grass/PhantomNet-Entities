@@ -373,9 +373,13 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is IMasterDetailsEntityStore<TEntity, TSubEntity> && Accessor is IMasterDetailsEntityAccessor<TEntity, TSubEntity>;
+                return Store is IMasterDetailsEntityStore<TEntity, TSubEntity> &&
+                    (Accessor is IMasterDetailsEntityAccessor<TEntity, TSubEntity> || HasDefaultMasterDetailsEntityAccessor);
             }
         }
+
+        protected virtual bool HasDefaultMasterDetailsEntityAccessor
+            => typeof(TEntity).IsAssignableFrom(typeof(IDetailsWiseEntity<TSubEntity>));
 
         protected virtual IMasterDetailsEntityStore<TEntity, TSubEntity> MasterDetailsStore
         {
@@ -399,6 +403,11 @@ namespace PhantomNet.Entities
                 var accessor = Accessor as IMasterDetailsEntityAccessor<TEntity, TSubEntity>;
                 if (accessor == null)
                 {
+                    if (HasDefaultMasterDetailsEntityAccessor)
+                    {
+                        return new DefaultMasterDetailsEntityAccessor<TEntity, TSubEntity>();
+                    }
+
                     // TODO:: Message
                     throw new NotSupportedException();
                 }
@@ -411,7 +420,7 @@ namespace PhantomNet.Entities
     }
 
     // Foundation
-    public abstract partial class EntityManagerBase<TEntity, TEntityManager>
+    public abstract partial class EntityManagerBase<TEntity, TEntityManager> : IDisposable
         where TEntity : class
         where TEntityManager : EntityManagerBase<TEntity, TEntityManager>
     {
@@ -951,9 +960,13 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is ITimeTrackedEntityStore<TEntity> && Accessor is ITimeTrackedEntityAccessor<TEntity>;
+                return Store is ITimeTrackedEntityStore<TEntity> &&
+                    (Accessor is ITimeTrackedEntityAccessor<TEntity> || HasDefaultTimeTrackedEntityAccessor);
             }
         }
+
+        protected virtual bool HasDefaultTimeTrackedEntityAccessor
+            => typeof(TEntity).IsAssignableFrom(typeof(ITimeWiseEntity));
 
         protected virtual ITimeTrackedEntityStore<TEntity> TimeTrackedEntityStore
         {
@@ -977,6 +990,11 @@ namespace PhantomNet.Entities
                 var accessor = Accessor as ITimeTrackedEntityAccessor<TEntity>;
                 if (accessor == null)
                 {
+                    if (HasDefaultTimeTrackedEntityAccessor)
+                    {
+                        return new DefaultTimeTrackedEntityAccessor<TEntity>();
+                    }
+
                     // TODO:: Message
                     throw new NotSupportedException();
                 }
@@ -1012,9 +1030,13 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is ICodeBasedEntityStore<TEntity> && Accessor is ICodeBasedEntityAccessor<TEntity>;
+                return Store is ICodeBasedEntityStore<TEntity> &&
+                    (Accessor is ICodeBasedEntityAccessor<TEntity> || HasDefaultCodeBasedEntityAccessor);
             }
         }
+
+        protected virtual bool HasDefaultCodeBasedEntityAccessor
+            => typeof(TEntity).IsAssignableFrom(typeof(ICodeWiseEntity));
 
         protected virtual ICodeBasedEntityStore<TEntity> CodeBasedEntityStore
         {
@@ -1038,6 +1060,11 @@ namespace PhantomNet.Entities
                 var accessor = Accessor as ICodeBasedEntityAccessor<TEntity>;
                 if (accessor == null)
                 {
+                    if (HasDefaultCodeBasedEntityAccessor)
+                    {
+                        return new DefaultCodeBasedEntityAccessor<TEntity>();
+                    }
+
                     // TODO:: Message
                     throw new NotSupportedException();
                 }
@@ -1101,9 +1128,13 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is INameBasedEntityStore<TEntity> && Accessor is INameBasedEntityAccessor<TEntity>;
+                return Store is INameBasedEntityStore<TEntity> &&
+                    (Accessor is INameBasedEntityAccessor<TEntity> || HasDefaultNameBasedEntityAccessor);
             }
         }
+
+        protected virtual bool HasDefaultNameBasedEntityAccessor
+            => typeof(TEntity).IsAssignableFrom(typeof(INameWiseEntity));
 
         protected virtual INameBasedEntityStore<TEntity> NameBasedEntityStore
         {
@@ -1127,6 +1158,11 @@ namespace PhantomNet.Entities
                 var accessor = Accessor as INameBasedEntityAccessor<TEntity>;
                 if (accessor == null)
                 {
+                    if (HasDefaultNameBasedEntityAccessor)
+                    {
+                        return new DefaultNameBasedEntityAccessor<TEntity>();
+                    }
+
                     // TODO:: Message
                     throw new NotSupportedException();
                 }
@@ -1180,9 +1216,12 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Accessor is ITaggedEntityAccessor<TEntity>;
+                return Accessor is ITaggedEntityAccessor<TEntity> || HasDefaultTaggedEntityAccessor;
             }
         }
+
+        protected virtual bool HasDefaultTaggedEntityAccessor
+            => typeof(TEntity).IsAssignableFrom(typeof(ITagsWiseEntity));
 
         protected virtual ITaggedEntityAccessor<TEntity> TaggedEntityAccessor
         {
@@ -1191,6 +1230,11 @@ namespace PhantomNet.Entities
                 var accessor = Accessor as ITaggedEntityAccessor<TEntity>;
                 if (accessor == null)
                 {
+                    if (HasDefaultTaggedEntityAccessor)
+                    {
+                        return new DefaultTaggedEntityAccessor<TEntity>();
+                    }
+
                     // TODO:: Message
                     throw new NotSupportedException();
                 }
