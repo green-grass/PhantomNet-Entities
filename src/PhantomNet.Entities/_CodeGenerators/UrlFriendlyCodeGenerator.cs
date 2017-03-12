@@ -37,7 +37,7 @@ namespace PhantomNet.Entities
             if (!typeof(TEntityManager).IsAssignableFrom(manager.GetType()))
             {
                 // TODO:: Message
-                throw new NotSupportedException(nameof(manager));
+                throw new NotSupportedException($"Expected {typeof(TEntityManager).Name}, found {manager.GetType().Name}.");
             }
             if (entity == null)
             {
