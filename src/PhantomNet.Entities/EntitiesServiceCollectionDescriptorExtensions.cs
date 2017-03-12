@@ -295,7 +295,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
             var managerService = TryMakeGenericType(managerType, managerTypeArguments);
-            var service = TryMakeGenericType(typeof(IEntityCodeGenerator<>), entityType, managerService);
+            var service = TryMakeGenericType(typeof(IEntityCodeGenerator<>), entityType);
             var implementationType = TryMakeGenericType(codeGeneratorType, entityType, managerService);
 
             services.TryAddScoped(service, implementationType);
