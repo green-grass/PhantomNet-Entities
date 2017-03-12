@@ -373,22 +373,7 @@ namespace PhantomNet.Entities
             get
             {
                 ThrowIfDisposed();
-                return Store is IMasterDetailsEntityStore<TEntity, TSubEntity> && Accessor is IMasterDetailsEntityAccessor<TEntity, TSubEntity>;
-            }
-        }
-
-        protected virtual IMasterDetailsEntityStore<TEntity, TSubEntity> MasterDetailsStore
-        {
-            get
-            {
-                ThrowIfDisposed();
-                var store = Store as IMasterDetailsEntityStore<TEntity, TSubEntity>;
-                if (store == null)
-                {
-                    throw new NotSupportedException(Strings.StoreNotIMasterDetailsEntityStore);
-                }
-
-                return store;
+                return Accessor is IMasterDetailsEntityAccessor<TEntity, TSubEntity>;
             }
         }
 
