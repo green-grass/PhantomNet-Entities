@@ -21,7 +21,7 @@ namespace PhantomNet.Entities
         protected EntityManagerBase(
             IDisposable store,
             object entityAccessor,
-            IEnumerable<IEntityValidator<TEntity, TSubEntity, TEntityManager>> entityValidators,
+            IEnumerable<IEntityValidator<TEntity, TSubEntity>> entityValidators,
             ILogger<EntityManagerBase<TEntity, TSubEntity, TEntityManager>> logger)
             : base(store, entityAccessor, entityValidators, logger)
         {
@@ -38,8 +38,8 @@ namespace PhantomNet.Entities
 
         #region Properties
 
-        private IList<IEntityValidator<TEntity, TSubEntity, TEntityManager>> EntityValidators { get; }
-            = new List<IEntityValidator<TEntity, TSubEntity, TEntityManager>>();
+        private IList<IEntityValidator<TEntity, TSubEntity>> EntityValidators { get; }
+            = new List<IEntityValidator<TEntity, TSubEntity>>();
 
         protected virtual IQueryable<TSubEntity> SubEntities
         {
@@ -126,7 +126,7 @@ namespace PhantomNet.Entities
             var errors = new List<GenericError>();
             foreach (var validator in EntityValidators)
             {
-                var result = await validator.ValidateAsync((TEntityManager)this, subEntity);
+                var result = await validator.ValidateAsync(this, subEntity);
                 if (!result.Succeeded)
                 {
                     errors.AddRange(result.Errors);
@@ -405,7 +405,7 @@ namespace PhantomNet.Entities
         protected EntityManagerBase(
             IDisposable store,
             object entityAccessor,
-            IEnumerable<IEntityValidator<TEntity, TEntityManager>> entityValidators,
+            IEnumerable<IEntityValidator<TEntity>> entityValidators,
             ILogger<EntityManagerBase<TEntity, TEntityManager>> logger)
         {
             if (!(this is TEntityManager))
@@ -438,8 +438,8 @@ namespace PhantomNet.Entities
 
         #region Properties
 
-        private IList<IEntityValidator<TEntity, TEntityManager>> EntityValidators { get; }
-            = new List<IEntityValidator<TEntity, TEntityManager>>();
+        private IList<IEntityValidator<TEntity>> EntityValidators { get; }
+            = new List<IEntityValidator<TEntity>>();
 
         protected virtual CancellationToken CancellationToken => CancellationToken.None;
 
@@ -587,7 +587,7 @@ namespace PhantomNet.Entities
             var errors = new List<GenericError>();
             foreach (var validator in EntityValidators)
             {
-                var result = await validator.ValidateAsync((TEntityManager)this, entity);
+                var result = await validator.ValidateAsync(this, entity);
                 if (!result.Succeeded)
                 {
                     errors.AddRange(result.Errors);

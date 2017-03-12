@@ -85,24 +85,24 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
         #region Validator
 
         public static IServiceCollection AddValidator<TEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType,
+            Type validatorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
         {
-            return AddValidator(services, typeof(TEntity), managerType, validatorType, additionalTypeArguments);
+            return AddValidator(services, typeof(TEntity), validatorType, additionalTypeArguments);
         }
 
         public static IServiceCollection AddValidator<TEntity, TSubEntity>(this IServiceCollection services,
-            Type managerType, Type validatorType,
+            Type validatorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
             where TSubEntity : class
         {
-            return AddValidator(services, typeof(TEntity), typeof(TSubEntity), managerType, validatorType, additionalTypeArguments);
+            return AddValidator(services, typeof(TEntity), typeof(TSubEntity), validatorType, additionalTypeArguments);
         }
 
         public static IServiceCollection AddValidator(this IServiceCollection services,
-            Type entityType, Type managerType, Type validatorType,
+            Type entityType, Type validatorType,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -113,25 +113,18 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             {
                 throw new ArgumentNullException(nameof(entityType));
             }
-            if (managerType == null)
-            {
-                throw new ArgumentNullException(nameof(managerType));
-            }
             if (validatorType == null)
             {
                 throw new ArgumentNullException(nameof(validatorType));
             }
 
-            var managerTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = TryMakeGenericType(managerType, managerTypeArguments);
-            var service = TryMakeGenericType(typeof(IEntityValidator<,>), entityType, managerService);
-            var validatorTypeArguments = managerTypeArguments.ToList();
+            var validatorTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToList();
             // Remove module marker
-            if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == managerType.GetTypeInfo().GenericTypeParameters.Count())
+            if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == validatorTypeArguments.Count - 1)
             {
                 validatorTypeArguments.RemoveAt(validatorTypeArguments.Count - 1);
             }
-            validatorTypeArguments.Add(managerService);
+            var service = TryMakeGenericType(typeof(IEntityValidator<>), entityType);
             var implementationType = TryMakeGenericType(validatorType, validatorTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
@@ -140,7 +133,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
         }
 
         public static IServiceCollection AddValidator(this IServiceCollection services,
-            Type entityType, Type subEntityType, Type managerType, Type validatorType,
+            Type entityType, Type subEntityType, Type validatorType,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -155,25 +148,18 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             {
                 throw new ArgumentNullException(nameof(subEntityType));
             }
-            if (managerType == null)
-            {
-                throw new ArgumentNullException(nameof(managerType));
-            }
             if (validatorType == null)
             {
                 throw new ArgumentNullException(nameof(validatorType));
             }
 
-            var managerTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
-            var managerService = TryMakeGenericType(managerType, managerTypeArguments);
-            var service = TryMakeGenericType(typeof(IEntityValidator<,,>), entityType, subEntityType, managerService);
-            var validatorTypeArguments = managerTypeArguments.ToList();
+            var validatorTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToList();
             // Remove module marker
-            if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == managerType.GetTypeInfo().GenericTypeParameters.Count())
+            if (validatorType.GetTypeInfo().GenericTypeParameters.Count() == validatorTypeArguments.Count - 1)
             {
                 validatorTypeArguments.RemoveAt(validatorTypeArguments.Count - 1);
             }
-            validatorTypeArguments.Add(managerService);
+            var service = TryMakeGenericType(typeof(IEntityValidator<,>), entityType, subEntityType);
             var implementationType = TryMakeGenericType(validatorType, validatorTypeArguments.ToArray());
 
             services.TryAddScoped(service, implementationType);
@@ -430,7 +416,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             if (validatorType != null)
             {
-                services = AddValidator(services, entityType, managerType, validatorType, additionalTypeArguments);
+                services = AddValidator(services, entityType, validatorType, additionalTypeArguments);
             }
 
             if (lookupNormalizerType != null)
@@ -454,7 +440,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             if (validatorType != null)
             {
-                services = AddValidator(services, entityType, subEntityType, managerType, validatorType, additionalTypeArguments);
+                services = AddValidator(services, entityType, subEntityType, validatorType, additionalTypeArguments);
             }
 
             if (lookupNormalizerType != null)
