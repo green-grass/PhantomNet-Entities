@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 namespace PhantomNet.Entities
 {
-    public class IncrementalCodeGenerator<TEntity, TEntityManager> : IEntityCodeGenerator<TEntity, TEntityManager>
+    public class IncrementalCodeGenerator<TEntity, TEntityManager> : IEntityCodeGenerator<TEntity>
         where TEntity : class
         where TEntityManager : class,
                                ITimeTrackedEntityManager<TEntity>,
@@ -19,7 +20,6 @@ namespace PhantomNet.Entities
             {
                 throw new ArgumentNullException(nameof(entityCodeAccessor));
             }
-
             if (incrementalCodeGeneratorOptions == null)
             {
                 throw new ArgumentNullException(nameof(incrementalCodeGeneratorOptions));
@@ -33,11 +33,25 @@ namespace PhantomNet.Entities
 
         protected ICodeBasedEntityAccessor<TEntity> EntityCodeAccessor { get; }
 
-        public async Task<string> GenerateCodeAsync(TEntityManager manager, TEntity entity, CancellationToken cancellationToken)
+        public async Task<string> GenerateCodeAsync(object manager, TEntity entity, CancellationToken cancellationToken)
         {
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
+            if (!typeof(TEntityManager).IsAssignableFrom(manager.GetType()))
+            {
+                // TODO:: Message
+                throw new NotSupportedException(nameof(manager));
+            }
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
 
-            var latestEntity = await manager.FindLatestAsync();
+            var latestEntity = await ((TEntityManager)manager).FindLatestAsync();
             if (latestEntity == null)
             {
                 return $"{Prefix}1";

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 namespace PhantomNet.Entities
 {
-    public class UrlFriendlyCodeGenerator<TEntity, TEntityManager> : IEntityCodeGenerator<TEntity, TEntityManager>
+    public class UrlFriendlyCodeGenerator<TEntity, TEntityManager> : IEntityCodeGenerator<TEntity>
         where TEntity : class
         where TEntityManager : class
     {
@@ -17,7 +18,6 @@ namespace PhantomNet.Entities
             {
                 throw new ArgumentNullException(nameof(entityNameAccessor));
             }
-
             if (urlFriendlyCodeGeneratorOptions == null)
             {
                 throw new ArgumentNullException(nameof(urlFriendlyCodeGeneratorOptions));
@@ -28,8 +28,22 @@ namespace PhantomNet.Entities
 
         protected INameBasedEntityAccessor<TEntity> EntityNameAccessor { get; }
 
-        public Task<string> GenerateCodeAsync(TEntityManager manager, TEntity entity, CancellationToken cancellationToken)
+        public Task<string> GenerateCodeAsync(object manager, TEntity entity, CancellationToken cancellationToken)
         {
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
+            if (!typeof(TEntityManager).IsAssignableFrom(manager.GetType()))
+            {
+                // TODO:: Message
+                throw new NotSupportedException(nameof(manager));
+            }
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
 
             var name = EntityNameAccessor.GetName(entity);

@@ -990,7 +990,7 @@ namespace PhantomNet.Entities
 
         protected ILookupNormalizer CodeNormalizer { get; set; }
 
-        protected IEntityCodeGenerator<TEntity, TEntityManager> CodeGenerator { get; set; }
+        protected IEntityCodeGenerator<TEntity> CodeGenerator { get; set; }
 
         protected virtual bool SupportsCodeBasedEntity
         {
@@ -1068,7 +1068,7 @@ namespace PhantomNet.Entities
                 throw new InvalidOperationException($"{nameof(CodeGenerator)} is null.");
             }
 
-            return CodeGenerator.GenerateCodeAsync((TEntityManager)this, entity, CancellationToken);
+            return CodeGenerator.GenerateCodeAsync(this, entity, CancellationToken);
         }
 
         #endregion

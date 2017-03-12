@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 
 namespace PhantomNet.Entities
 {
-    public interface IEntityCodeGenerator<in TEntity, in TEntityManager>
+    public interface IEntityCodeGenerator<in TEntity>
         where TEntity : class
-        where TEntityManager : class
     {
-        Task<string> GenerateCodeAsync(TEntityManager manager, TEntity entity, CancellationToken cancellationToken);
+        Task<string> GenerateCodeAsync(object manager, TEntity entity, CancellationToken cancellationToken);
     }
 }
