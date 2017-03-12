@@ -532,6 +532,11 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             if (!collection.Any(x => x.ServiceType == descriptor.ServiceType && x.ImplementationType == descriptor.ImplementationType))
             {
+                var current = collection.SingleOrDefault(x => x.ServiceType == descriptor.ServiceType);
+                if (current != null)
+                {
+                    collection.Remove(current);
+                }
                 collection.Add(descriptor);
             }
         }
