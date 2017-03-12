@@ -43,22 +43,6 @@ namespace PhantomNet.Entities
         }
 
         /// <summary>
-        /// Generic class {0} must also be used as class parameter.
-        /// </summary>
-        internal static string GenericClassNotMatched
-        {
-            get { return GetString("GenericClassNotMatched"); }
-        }
-
-        /// <summary>
-        /// Generic class {0} must also be used as class parameter.
-        /// </summary>
-        internal static string FormatGenericClassNotMatched(object p0)
-        {
-            return string.Format(CultureInfo.CurrentCulture, GetString("GenericClassNotMatched"), p0);
-        }
-
-        /// <summary>
         /// Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;.
         /// </summary>
         internal static string StoreNotICodeBasedEntityStore

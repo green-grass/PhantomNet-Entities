@@ -123,9 +123,6 @@
   <data name="DefaultError" xml:space="preserve">
     <value>An unknown failure has occured.</value>
   </data>
-  <data name="GenericClassNotMatched" xml:space="preserve">
-    <value>Generic class {0} must also be used as class parameter.</value>
-  </data>
   <data name="StoreNotICodeBasedEntityStore" xml:space="preserve">
     <value>Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;.</value>
   </data>

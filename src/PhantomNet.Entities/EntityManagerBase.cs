@@ -10,11 +10,10 @@ using Microsoft.Extensions.Logging;
 namespace PhantomNet.Entities
 {
     // Foundation
-    public abstract partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
-        : EntityManagerBase<TEntity, TEntityManager>
+    public abstract partial class EntityManagerBase<TEntity, TSubEntity>
+        : EntityManagerBase<TEntity>
         where TEntity : class
         where TSubEntity : class
-        where TEntityManager : EntityManagerBase<TEntity, TSubEntity, TEntityManager>
     {
         #region Constructors
 
@@ -22,7 +21,7 @@ namespace PhantomNet.Entities
             IDisposable store,
             object entityAccessor,
             IEnumerable<IEntityValidator<TEntity, TSubEntity>> entityValidators,
-            ILogger<EntityManagerBase<TEntity, TSubEntity, TEntityManager>> logger)
+            ILogger<EntityManagerBase<TEntity, TSubEntity>> logger)
             : base(store, entityAccessor, entityValidators, logger)
         {
             if (entityValidators != null)
@@ -144,7 +143,7 @@ namespace PhantomNet.Entities
     }
 
     // Entity
-    partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity, TSubEntity>
     {
         #region Properties
 
@@ -191,7 +190,7 @@ namespace PhantomNet.Entities
     }
 
     // QueryableEntity
-    partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity, TSubEntity>
     {
         #region Properties
 
@@ -223,7 +222,7 @@ namespace PhantomNet.Entities
     }
 
     // GroupedEntity
-    partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity, TSubEntity>
     {
         #region Properties
 
@@ -286,7 +285,7 @@ namespace PhantomNet.Entities
     }
 
     // ScopedNameBasedEntity
-    partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity, TSubEntity>
     {
         #region Properties
 
@@ -364,7 +363,7 @@ namespace PhantomNet.Entities
     }
 
     // MasterDetailsEntity
-    partial class EntityManagerBase<TEntity, TSubEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity, TSubEntity>
     {
         #region Properties
 
@@ -396,9 +395,8 @@ namespace PhantomNet.Entities
     }
 
     // Foundation
-    public abstract partial class EntityManagerBase<TEntity, TEntityManager> : IDisposable
+    public abstract partial class EntityManagerBase<TEntity> : IDisposable
         where TEntity : class
-        where TEntityManager : EntityManagerBase<TEntity, TEntityManager>
     {
         #region Constructors
 
@@ -406,12 +404,8 @@ namespace PhantomNet.Entities
             IDisposable store,
             object entityAccessor,
             IEnumerable<IEntityValidator<TEntity>> entityValidators,
-            ILogger<EntityManagerBase<TEntity, TEntityManager>> logger)
+            ILogger<EntityManagerBase<TEntity>> logger)
         {
-            if (!(this is TEntityManager))
-            {
-                throw new NotSupportedException(Strings.FormatGenericClassNotMatched(nameof(TEntityManager)));
-            }
             if (store == null)
             {
                 throw new ArgumentNullException(nameof(store));
@@ -652,7 +646,7 @@ namespace PhantomNet.Entities
     }
 
     // Entity
-    partial class EntityManagerBase<TEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity>
     {
         #region Properties
 
@@ -782,7 +776,7 @@ namespace PhantomNet.Entities
     }
 
     // QueryableEntity
-    partial class EntityManagerBase<TEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity>
     {
         #region Properties
 
@@ -927,7 +921,7 @@ namespace PhantomNet.Entities
     }
 
     // TimeTrackedEntity
-    partial class EntityManagerBase<TEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity>
     {
         #region Properties
 
@@ -984,7 +978,7 @@ namespace PhantomNet.Entities
     }
 
     // CodeBasedEntity
-    partial class EntityManagerBase<TEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity>
     {
         #region Properties
 
@@ -1075,7 +1069,7 @@ namespace PhantomNet.Entities
     }
 
     // NameBasedEntity
-    partial class EntityManagerBase<TEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity>
     {
         #region Properties
 
@@ -1154,7 +1148,7 @@ namespace PhantomNet.Entities
     }
 
     // TaggedEntity
-    partial class EntityManagerBase<TEntity, TEntityManager>
+    partial class EntityManagerBase<TEntity>
     {
         #region Properties
 
