@@ -9,7 +9,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
     {
         #region Manager
 
-        public static IServiceCollection AddManager<TEntity>(this IServiceCollection services,
+        public static IServiceCollection AddManager<TEntity>(
+            this IServiceCollection services,
             Type managerType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -17,7 +18,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddManager(services, typeof(TEntity), managerType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddManager<TEntity, TSubEntity>(this IServiceCollection services,
+        public static IServiceCollection AddManager<TEntity, TSubEntity>(
+            this IServiceCollection services,
             Type managerType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -26,7 +28,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddManager(services, typeof(TEntity), typeof(TSubEntity), managerType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddManager(this IServiceCollection services,
+        public static IServiceCollection AddManager(
+            this IServiceCollection services,
             Type entityType, Type managerType,
             params Type[] additionalTypeArguments)
         {
@@ -51,7 +54,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return services;
         }
 
-        public static IServiceCollection AddManager(this IServiceCollection services,
+        public static IServiceCollection AddManager(
+            this IServiceCollection services,
             Type entityType, Type subEntityType, Type managerType,
             params Type[] additionalTypeArguments)
         {
@@ -84,7 +88,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
         #region Validator
 
-        public static IServiceCollection AddValidator<TEntity>(this IServiceCollection services,
+        public static IServiceCollection AddValidator<TEntity>(
+            this IServiceCollection services,
             Type managerType, Type validatorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -92,7 +97,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddValidator(services, typeof(TEntity), managerType, validatorType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddValidator<TEntity, TSubEntity>(this IServiceCollection services,
+        public static IServiceCollection AddValidator<TEntity, TSubEntity>(
+            this IServiceCollection services,
             Type managerType, Type validatorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -101,7 +107,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddValidator(services, typeof(TEntity), typeof(TSubEntity), managerType, validatorType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddValidator(this IServiceCollection services,
+        public static IServiceCollection AddValidator(
+            this IServiceCollection services,
             Type entityType, Type managerType, Type validatorType,
             params Type[] additionalTypeArguments)
         {
@@ -139,7 +146,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return services;
         }
 
-        public static IServiceCollection AddValidator(this IServiceCollection services,
+        public static IServiceCollection AddValidator(
+            this IServiceCollection services,
             Type entityType, Type subEntityType, Type managerType, Type validatorType,
             params Type[] additionalTypeArguments)
         {
@@ -185,14 +193,16 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
         #region LookupNormalizer
 
-        public static IServiceCollection AddLookupNormalizer<TEntity>(this IServiceCollection services,
+        public static IServiceCollection AddLookupNormalizer<TEntity>(
+            this IServiceCollection services,
             Type lookupNormalizerType)
             where TEntity : class
         {
             return AddLookupNormalizer(services, typeof(TEntity), lookupNormalizerType);
         }
 
-        public static IServiceCollection AddLookupNormalizer(this IServiceCollection services,
+        public static IServiceCollection AddLookupNormalizer(
+            this IServiceCollection services,
             Type entityType, Type lookupNormalizerType)
         {
             if (services == null)
@@ -220,7 +230,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
         #region CodeGenerator
 
-        public static IServiceCollection AddCodeGenerator<TEntity>(this IServiceCollection services,
+        public static IServiceCollection AddCodeGenerator<TEntity>(
+            this IServiceCollection services,
             Type managerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -228,7 +239,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddCodeGenerator(services, typeof(TEntity), managerType, codeGeneratorType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddCodeGenerator<TEntity, TSubEntity>(this IServiceCollection services,
+        public static IServiceCollection AddCodeGenerator<TEntity, TSubEntity>(
+            this IServiceCollection services,
             Type managerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -237,7 +249,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddCodeGenerator(services, typeof(TEntity), typeof(TSubEntity), managerType, codeGeneratorType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddCodeGenerator(this IServiceCollection services,
+        public static IServiceCollection AddCodeGenerator(
+            this IServiceCollection services,
             Type entityType, Type managerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
         {
@@ -268,7 +281,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return services;
         }
 
-        public static IServiceCollection AddCodeGenerator(this IServiceCollection services,
+        public static IServiceCollection AddCodeGenerator(
+            this IServiceCollection services,
             Type entityType, Type subEntityType, Type managerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
         {
@@ -307,7 +321,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
         #region Store
 
-        public static IServiceCollection AddStore(this IServiceCollection services,
+        public static IServiceCollection AddStore(
+            this IServiceCollection services,
             Type entityType,
             Type storeServiceType,
             Type storeImplementationType, Type storeWithKeyTypeImplementationType, Type[] storeImplementationTypeArguments,
@@ -356,7 +371,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
         #region Accessor
 
-        public static IServiceCollection AddAccessor(this IServiceCollection services,
+        public static IServiceCollection AddAccessor(
+            this IServiceCollection services,
             Type entityType,
             Type accessorServiceType,
             Type accessorImplementationType, Type accessorWithKeyTypeImplementationType, Type[] accessorImplementationTypeArguments,
@@ -405,7 +421,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
         #region Entity
 
-        public static IServiceCollection AddEntity<TEntity>(this IServiceCollection services,
+        public static IServiceCollection AddEntity<TEntity>(
+            this IServiceCollection services,
             Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -413,7 +430,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddEntity(services, typeof(TEntity), managerType, validatorType, lookupNormalizerType, codeGeneratorType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddEntity<TEntity, TSubEntity>(this IServiceCollection services,
+        public static IServiceCollection AddEntity<TEntity, TSubEntity>(
+            this IServiceCollection services,
             Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
             where TEntity : class
@@ -422,7 +440,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return AddEntity(services, typeof(TEntity), typeof(TSubEntity), managerType, validatorType, lookupNormalizerType, codeGeneratorType, additionalTypeArguments);
         }
 
-        public static IServiceCollection AddEntity(this IServiceCollection services,
+        public static IServiceCollection AddEntity(
+            this IServiceCollection services,
             Type entityType, Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
         {
@@ -446,7 +465,8 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             return services;
         }
 
-        public static IServiceCollection AddEntity(this IServiceCollection services,
+        public static IServiceCollection AddEntity(
+            this IServiceCollection services,
             Type entityType, Type subEntityType, Type managerType, Type validatorType, Type lookupNormalizerType, Type codeGeneratorType,
             params Type[] additionalTypeArguments)
         {
