@@ -165,4 +165,7 @@
   <data name="UnsupportedEntityManager" xml:space="preserve">
     <value>Unsupported entity manager for '{0}'. Expected '{1}', found '{2}'.</value>
   </data>
+  <data name="ValidatorNeverValidatesEntity" xml:space="preserve">
+    <value>{0} should never validates {1}.</value>
+  </data>
 </root>

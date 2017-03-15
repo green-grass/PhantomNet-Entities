@@ -6,6 +6,22 @@ using System.Threading.Tasks;
 
 namespace PhantomNet.Entities
 {
+    public abstract class EntityValidatorBase<TEntity, TSubEntity, TEntityManager>
+        : EntityValidatorBase<TEntity, TEntityManager>,
+          IEntityValidator<TEntity, TSubEntity>
+        where TEntity : class
+        where TSubEntity : class
+        where TEntityManager : class
+    {
+        public virtual Task<GenericResult> ValidateAsync(object manager, TSubEntity subEntity)
+        {
+            throw new InvalidOperationException(string.Format(
+                Strings.ValidatorNeverValidatesEntity,
+                GetType().Name,
+                typeof(TSubEntity).Name));
+        }
+    }
+
     public abstract class EntityValidatorBase<TEntity, TEntityManager>
         : IEntityValidator<TEntity>
         where TEntity : class
@@ -19,10 +35,11 @@ namespace PhantomNet.Entities
             }
             if (!typeof(TEntityManager).IsAssignableFrom(manager.GetType()))
             {
-                throw new NotSupportedException(
-                    string.Format(Strings.UnsupportedEntityManager,
+                throw new NotSupportedException(string.Format(
+                    Strings.UnsupportedEntityManager,
                     GetType().Name,
-                    typeof(TEntityManager).Name, manager.GetType().Name));
+                    typeof(TEntityManager).Name,
+                    manager.GetType().Name));
             }
             if (entity == null)
             {
