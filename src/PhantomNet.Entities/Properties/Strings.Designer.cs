@@ -193,5 +193,14 @@ namespace PhantomNet.Entities.Properties {
                 return ResourceManager.GetString("StoreNotITimeTrackedEntityStore", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Unsupported entity manager for &apos;{0}&apos;. Expected &apos;{1}&apos;, found &apos;{2}&apos;..
+        /// </summary>
+        public static string UnsupportedEntityManager {
+            get {
+                return ResourceManager.GetString("UnsupportedEntityManager", resourceCulture);
+            }
+        }
     }
 }

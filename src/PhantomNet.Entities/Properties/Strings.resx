@@ -162,4 +162,7 @@
   <data name="StoreNotITimeTrackedEntityStore" xml:space="preserve">
     <value>Store does not implement ITimeTrackedEntityStore&lt;TEntity&gt;.</value>
   </data>
+  <data name="UnsupportedEntityManager" xml:space="preserve">
+    <value>Unsupported entity manager for '{0}'. Expected '{1}', found '{2}'.</value>
+  </data>
 </root>
