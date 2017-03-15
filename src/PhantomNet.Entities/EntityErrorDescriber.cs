@@ -1,4 +1,6 @@
-﻿namespace PhantomNet.Entities
+﻿using PhantomNet.Entities.Properties;
+
+namespace PhantomNet.Entities
 {
     // TODO:: Refactor
     public class EntityErrorDescriber : ErrorDescriber

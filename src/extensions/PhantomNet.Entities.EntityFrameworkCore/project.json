@@ -12,15 +12,13 @@
   },
 
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.0.0",
-    "NETStandard.Library": "1.6.0",
+    "Microsoft.EntityFrameworkCore": "1.1.1",
+    "NETStandard.Library": "1.6.1",
     "PhantomNet.Entities": "1.0.3-*",
-    "System.ComponentModel.TypeConverter": "4.1.0"
+    "System.ComponentModel.TypeConverter": "4.3.0"
   },
 
   "frameworks": {
-    "netstandard1.6": {
-      "imports": "dnxcore50"
-    }
+    "netstandard1.6": {}
   }
 }

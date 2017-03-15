@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using PhantomNet.Entities.Properties;
 
 namespace PhantomNet.Entities
 {

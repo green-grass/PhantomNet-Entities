@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using PhantomNet.Entities.EntityFrameworkCore.Properties;
 
 namespace PhantomNet.Entities.EntityFrameworkCore
 {
@@ -207,7 +208,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
                 return subEntity as T;
             }
 
-            throw new InvalidOperationException(Strings.FormatEntityTypeOrSubEntityTypeNotSupported(nameof(T), nameof(TEntity), nameof(TSubEntity)));
+            throw new InvalidOperationException(string.Format(Strings.EntityTypeOrSubEntityTypeNotSupported, nameof(T), nameof(TEntity), nameof(TSubEntity)));
         }
 
         #endregion
@@ -462,7 +463,7 @@ namespace PhantomNet.Entities.EntityFrameworkCore
             }
             if (typeof(T) != typeof(TEntity))
             {
-                throw new InvalidOperationException(Strings.FormatEntityTypeNotSupported(nameof(T), nameof(TEntity)));
+                throw new InvalidOperationException(string.Format(Strings.EntityTypeNotSupported, nameof(T), nameof(TEntity)));
             }
 
             var key = ConvertIdFromString<TKey>(id);
