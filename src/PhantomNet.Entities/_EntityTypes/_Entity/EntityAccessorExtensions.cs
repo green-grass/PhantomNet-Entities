@@ -92,7 +92,7 @@ namespace PhantomNet.Entities
         private static string ConvertIdToString<TKey>(TKey id)
             where TKey : IEquatable<TKey>
         {
-            if (id.Equals(default(TKey)))
+            if (object.Equals(id, default(TKey)))
             {
                 return null;
             }
