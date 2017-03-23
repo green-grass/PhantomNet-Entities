@@ -5,7 +5,7 @@ using PhantomNet.Entities;
 
 namespace Microsoft.Extensions.DependencyInjection.Extensions
 {
-    public static class EntitiesServiceCollectionDescriptorExtensions
+    public static class EntitiesServiceCollectionExtensions
     {
         #region Manager
 
