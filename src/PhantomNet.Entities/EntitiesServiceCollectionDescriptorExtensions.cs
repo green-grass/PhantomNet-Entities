@@ -349,8 +349,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             this IServiceCollection services,
             Type entityType,
             Type storeServiceType,
-            Type storeImplementationType, Type storeWithKeyTypeImplementationType, Type[] storeImplementationTypeArguments,
-            Type keyType, int keyTypeIndex,
+            Type storeImplementationType, Type[] storeImplementationTypeArguments,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -369,10 +368,6 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             {
                 throw new ArgumentNullException(nameof(storeImplementationType));
             }
-            if (storeWithKeyTypeImplementationType == null)
-            {
-                throw new ArgumentNullException(nameof(storeWithKeyTypeImplementationType));
-            }
             if (storeImplementationTypeArguments == null)
             {
                 throw new ArgumentNullException(nameof(storeImplementationTypeArguments));
@@ -384,11 +379,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             var serviceTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
             var service = TryMakeGenericType(storeServiceType, serviceTypeArguments);
-            var storeWithKeyTypeImplementationTypeArguments = storeImplementationTypeArguments.ToList();
-            storeWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
-            var implementationType = keyType == null ?
-                TryMakeGenericType(storeImplementationType, storeImplementationTypeArguments) :
-                TryMakeGenericType(storeWithKeyTypeImplementationType, storeWithKeyTypeImplementationTypeArguments.ToArray());
+            var implementationType = TryMakeGenericType(storeImplementationType, storeImplementationTypeArguments);
 
             services.TryAddScopedMatchImplementation(service, implementationType);
 
@@ -399,8 +390,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             this IServiceCollection services,
             Type entityType, Type subEntityType,
             Type storeServiceType,
-            Type storeImplementationType, Type storeWithKeyTypeImplementationType, Type[] storeImplementationTypeArguments,
-            Type keyType, int keyTypeIndex,
+            Type storeImplementationType, Type[] storeImplementationTypeArguments,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -423,10 +413,6 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             {
                 throw new ArgumentNullException(nameof(storeImplementationType));
             }
-            if (storeWithKeyTypeImplementationType == null)
-            {
-                throw new ArgumentNullException(nameof(storeWithKeyTypeImplementationType));
-            }
             if (storeImplementationTypeArguments == null)
             {
                 throw new ArgumentNullException(nameof(storeImplementationTypeArguments));
@@ -438,11 +424,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             var serviceTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
             var service = TryMakeGenericType(storeServiceType, serviceTypeArguments);
-            var storeWithKeyTypeImplementationTypeArguments = storeImplementationTypeArguments.ToList();
-            storeWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
-            var implementationType = keyType == null ?
-                TryMakeGenericType(storeImplementationType, storeImplementationTypeArguments) :
-                TryMakeGenericType(storeWithKeyTypeImplementationType, storeWithKeyTypeImplementationTypeArguments.ToArray());
+            var implementationType = TryMakeGenericType(storeImplementationType, storeImplementationTypeArguments);
 
             services.TryAddScopedMatchImplementation(service, implementationType);
 
@@ -457,8 +439,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             this IServiceCollection services,
             Type entityType,
             Type accessorServiceType,
-            Type accessorImplementationType, Type accessorWithKeyTypeImplementationType, Type[] accessorImplementationTypeArguments,
-            Type keyType, int keyTypeIndex,
+            Type accessorImplementationType, Type[] accessorImplementationTypeArguments,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -477,10 +458,6 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             {
                 throw new ArgumentNullException(nameof(accessorImplementationType));
             }
-            if (accessorWithKeyTypeImplementationType == null)
-            {
-                throw new ArgumentNullException(nameof(accessorWithKeyTypeImplementationType));
-            }
             if (accessorImplementationTypeArguments == null)
             {
                 throw new ArgumentNullException(nameof(accessorImplementationTypeArguments));
@@ -492,11 +469,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             var serviceTypeArguments = new Type[] { entityType }.Concat(additionalTypeArguments).ToArray();
             var service = TryMakeGenericType(accessorServiceType, serviceTypeArguments);
-            var accessorWithKeyTypeImplementationTypeArguments = accessorImplementationTypeArguments.ToList();
-            accessorWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
-            var implementationType = keyType == null ?
-                TryMakeGenericType(accessorImplementationType, accessorImplementationTypeArguments) :
-                TryMakeGenericType(accessorWithKeyTypeImplementationType, accessorWithKeyTypeImplementationTypeArguments.ToArray());
+            var implementationType = TryMakeGenericType(accessorImplementationType, accessorImplementationTypeArguments);
 
             services.TryAddScopedMatchImplementation(service, implementationType);
 
@@ -507,8 +480,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             this IServiceCollection services,
             Type entityType, Type subEntityType,
             Type accessorServiceType,
-            Type accessorImplementationType, Type accessorWithKeyTypeImplementationType, Type[] accessorImplementationTypeArguments,
-            Type keyType, int keyTypeIndex,
+            Type accessorImplementationType, Type[] accessorImplementationTypeArguments,
             params Type[] additionalTypeArguments)
         {
             if (services == null)
@@ -531,10 +503,6 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
             {
                 throw new ArgumentNullException(nameof(accessorImplementationType));
             }
-            if (accessorWithKeyTypeImplementationType == null)
-            {
-                throw new ArgumentNullException(nameof(accessorWithKeyTypeImplementationType));
-            }
             if (accessorImplementationTypeArguments == null)
             {
                 throw new ArgumentNullException(nameof(accessorImplementationTypeArguments));
@@ -546,11 +514,7 @@ namespace Microsoft.Extensions.DependencyInjection.Extensions
 
             var serviceTypeArguments = new Type[] { entityType, subEntityType }.Concat(additionalTypeArguments).ToArray();
             var service = TryMakeGenericType(accessorServiceType, serviceTypeArguments);
-            var accessorWithKeyTypeImplementationTypeArguments = accessorImplementationTypeArguments.ToList();
-            accessorWithKeyTypeImplementationTypeArguments.Insert(keyTypeIndex, keyType);
-            var implementationType = keyType == null ?
-                TryMakeGenericType(accessorImplementationType, accessorImplementationTypeArguments) :
-                TryMakeGenericType(accessorWithKeyTypeImplementationType, accessorWithKeyTypeImplementationTypeArguments.ToArray());
+            var implementationType = TryMakeGenericType(accessorImplementationType, accessorImplementationTypeArguments);
 
             services.TryAddScopedMatchImplementation(service, implementationType);
 
