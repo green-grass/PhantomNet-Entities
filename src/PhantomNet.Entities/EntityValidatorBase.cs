@@ -13,7 +13,38 @@ namespace PhantomNet.Entities
         where TSubEntity : class
         where TEntityManager : class
     {
-        public virtual Task<GenericResult> ValidateAsync(object manager, TSubEntity subEntity)
+        public virtual async Task<GenericResult> ValidateAsync(object manager, TSubEntity subEntity)
+        {
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
+            if (!typeof(TEntityManager).IsAssignableFrom(manager.GetType()))
+            {
+                throw new NotSupportedException(string.Format(
+                    Strings.UnsupportedEntityManager,
+                    GetType().Name,
+                    typeof(TEntityManager).Name,
+                    manager.GetType().Name));
+            }
+            if (subEntity == null)
+            {
+                throw new ArgumentNullException(nameof(subEntity));
+            }
+
+            var errors = new List<GenericError>();
+
+            await ValidateInternalAsync(manager, subEntity, errors);
+
+            if (errors.Count > 0)
+            {
+                return GenericResult.Failed(errors.ToArray());
+            }
+
+            return GenericResult.Success;
+        }
+
+        protected virtual Task ValidateInternalAsync(object manager, TSubEntity subEntity, List<GenericError> errors)
         {
             throw new InvalidOperationException(string.Format(
                 Strings.ValidatorNeverValidatesEntity,
