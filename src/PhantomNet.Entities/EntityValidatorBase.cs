@@ -34,7 +34,7 @@ namespace PhantomNet.Entities
 
             var errors = new List<GenericError>();
 
-            await ValidateInternalAsync(manager, subEntity, errors);
+            await ValidateInternalAsync((TEntityManager)manager, subEntity, errors);
 
             if (errors.Count > 0)
             {
@@ -44,7 +44,7 @@ namespace PhantomNet.Entities
             return GenericResult.Success;
         }
 
-        protected virtual Task ValidateInternalAsync(object manager, TSubEntity subEntity, List<GenericError> errors)
+        protected virtual Task ValidateInternalAsync(TEntityManager manager, TSubEntity subEntity, List<GenericError> errors)
         {
             throw new InvalidOperationException(string.Format(
                 Strings.ValidatorNeverValidatesEntity,
@@ -79,7 +79,7 @@ namespace PhantomNet.Entities
 
             var errors = new List<GenericError>();
 
-            await ValidateInternalAsync(manager, entity, errors);
+            await ValidateInternalAsync((TEntityManager)manager, entity, errors);
 
             if (errors.Count > 0)
             {
@@ -89,6 +89,6 @@ namespace PhantomNet.Entities
             return GenericResult.Success;
         }
 
-        protected abstract Task ValidateInternalAsync(object manager, TEntity entity, List<GenericError> errors);
+        protected abstract Task ValidateInternalAsync(TEntityManager manager, TEntity entity, List<GenericError> errors);
     }
 }
