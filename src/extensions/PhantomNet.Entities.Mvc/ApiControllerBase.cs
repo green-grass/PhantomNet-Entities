@@ -8,23 +8,19 @@ using PhantomNet.Entities.Mvc.Properties;
 namespace PhantomNet.Entities.Mvc
 {
     // Foundation
-    public abstract partial class ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber> : Controller
+    public abstract partial class ApiControllerBase<TModel, TViewModel, TModelManager> : Controller
         where TModel : class
         where TViewModel : class
         where TModelManager : IDisposable
-        where TErrorDescriber : class
     {
-        public ApiControllerBase(TModelManager manager, TErrorDescriber errorDescriber)
+        public ApiControllerBase(TModelManager manager)
         {
             Manager = manager;
-            ErrorDescriber = errorDescriber;
         }
 
         #region Properties
 
         protected TModelManager Manager { get; }
-
-        protected TErrorDescriber ErrorDescriber { get; }
 
         #endregion
 
@@ -63,7 +59,7 @@ namespace PhantomNet.Entities.Mvc
     }
 
     // Entity
-    partial class ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber>
+    partial class ApiControllerBase<TModel, TViewModel, TModelManager>
     {
         #region Properties
 

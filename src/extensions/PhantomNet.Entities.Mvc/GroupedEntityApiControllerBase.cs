@@ -8,8 +8,8 @@ using Microsoft.Extensions.Localization;
 
 namespace PhantomNet.Entities.Mvc
 {
-    public abstract class GroupedEntityApiControllerBase<TModel, TModelGroup, TViewModel, TViewModelGroup, TKey, TModelSearchDescriptor, TModelManager, TErrorDescriber>
-        : ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber>
+    public abstract class GroupedEntityApiControllerBase<TModel, TModelGroup, TViewModel, TViewModelGroup, TKey, TModelSearchDescriptor, TModelManager>
+        : ApiControllerBase<TModel, TViewModel, TModelManager>
         where TModel : class
         where TModelGroup : class
         where TViewModel : class
@@ -17,10 +17,9 @@ namespace PhantomNet.Entities.Mvc
         where TKey : IEquatable<TKey>
         where TModelSearchDescriptor : class, IEntitySearchDescriptor<TModel>, IGroupedEntitySearchDescriptor<TKey>, new()
         where TModelManager : IGroupedEntityManager<TModel, TModelGroup>
-        where TErrorDescriber : class
     {
-        public GroupedEntityApiControllerBase(TModelManager manager, TErrorDescriber errorDescriber, IStringLocalizer localizer)
-            : base(manager, errorDescriber)
+        public GroupedEntityApiControllerBase(TModelManager manager, IStringLocalizer localizer)
+            : base(manager)
         {
             Localizer = localizer;
         }

@@ -5,16 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PhantomNet.Entities.Mvc
 {
-    public abstract class ReadOnlyEntityApiControllerBase<TModel, TViewModel, TModelSearchDescriptor, TModelManager, TErrorDescriber>
-        : ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber>
+    public abstract class ReadOnlyEntityApiControllerBase<TModel, TViewModel, TModelSearchDescriptor, TModelManager>
+        : ApiControllerBase<TModel, TViewModel, TModelManager>
         where TModel : class
         where TViewModel : class
         where TModelSearchDescriptor : class, IEntitySearchDescriptor<TModel>, new()
         where TModelManager : IDisposable
-        where TErrorDescriber : class
     {
-        public ReadOnlyEntityApiControllerBase(TModelManager manager, TErrorDescriber errorDescriber)
-            : base(manager, errorDescriber)
+        public ReadOnlyEntityApiControllerBase(TModelManager manager)
+            : base(manager)
         { }
 
         [HttpGet]

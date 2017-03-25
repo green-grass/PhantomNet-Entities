@@ -7,16 +7,15 @@ using Microsoft.Extensions.Localization;
 
 namespace PhantomNet.Entities.Mvc
 {
-    public abstract class EntityApiControllerBase<TModel, TViewModel, TModelSearchDescriptor, TModelManager, TErrorDescriber>
-        : ApiControllerBase<TModel, TViewModel, TModelManager, TErrorDescriber>
+    public abstract class EntityApiControllerBase<TModel, TViewModel, TModelSearchDescriptor, TModelManager>
+        : ApiControllerBase<TModel, TViewModel, TModelManager>
         where TModel : class
         where TViewModel : class
         where TModelSearchDescriptor : class, IEntitySearchDescriptor<TModel>, new()
         where TModelManager : IDisposable
-        where TErrorDescriber : class
     {
-        public EntityApiControllerBase(TModelManager manager, TErrorDescriber errorDescriber, IStringLocalizer localizer)
-            : base(manager, errorDescriber)
+        public EntityApiControllerBase(TModelManager manager, IStringLocalizer localizer)
+            : base(manager)
         {
             Localizer = localizer;
         }
