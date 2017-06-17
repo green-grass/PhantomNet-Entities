@@ -123,6 +123,9 @@
   <data name="DefaultError" xml:space="preserve">
     <value>An unknown failure has occured.</value>
   </data>
+  <data name="InvalidSortProperty" xml:space="preserve">
+    <value>Invalid sort expression '{0}'. Property '{1}' not found in '{2}' class.</value>
+  </data>
   <data name="StoreNotICodeBasedEntityStore" xml:space="preserve">
     <value>Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;.</value>
   </data>

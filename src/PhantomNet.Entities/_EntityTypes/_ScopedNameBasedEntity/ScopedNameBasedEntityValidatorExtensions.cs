@@ -6,7 +6,8 @@ namespace PhantomNet.Entities
 {
     public static class ScopedNameBasedEntityValidatorExtensions
     {
-        public static async Task ValidateNameAsync<TEntity, TSubEntity, TEntityManager, TEntityAccessor>(this IEntityValidator<TEntity, TSubEntity> validator,
+        public static async Task ValidateNameAsync<TEntity, TSubEntity, TEntityManager, TEntityAccessor>(
+            this IEntityValidator<TEntity, TSubEntity> validator,
             TEntityManager manager, TEntityAccessor entityAccessor, TEntity entity, List<GenericError> errors,
             Func<string, GenericError> invalidName, Func<string, GenericError> duplicateName)
             where TEntity : class

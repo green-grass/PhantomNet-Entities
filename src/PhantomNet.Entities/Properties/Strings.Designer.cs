@@ -78,6 +78,15 @@ namespace PhantomNet.Entities.Properties {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to Invalid sort expression &apos;{0}&apos;. Property &apos;{1}&apos; not found in &apos;{2}&apos; class..
+        /// </summary>
+        public static string InvalidSortProperty {
+            get {
+                return ResourceManager.GetString("InvalidSortProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Store does not implement ICodeBasedEntityStore&lt;TEntity&gt;..
         /// </summary>
         public static string StoreNotICodeBasedEntityStore {

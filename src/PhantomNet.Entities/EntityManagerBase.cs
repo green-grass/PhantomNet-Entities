@@ -896,6 +896,10 @@ namespace PhantomNet.Entities
 
                 var param = Expression.Parameter(typeof(TEntity));
                 var propertyInfo = typeof(TEntity).GetProperty(sort);
+                if (propertyInfo == null)
+                {
+                    throw new InvalidOperationException(string.Format(Strings.InvalidSortProperty, searchDescriptor.SortExpression, sort, typeof(TEntity).Name));
+                }
                 var propertyExpression = Expression.Lambda(Expression.Property(param, propertyInfo), param);
                 entities = (IOrderedQueryable<TEntity>)entities.Provider.CreateQuery(Expression.Call(
                     typeof(Queryable),
@@ -1060,6 +1064,7 @@ namespace PhantomNet.Entities
         {
             if (CodeGenerator == null)
             {
+                // TODO:: Use resources
                 throw new InvalidOperationException($"{nameof(CodeGenerator)} is null.");
             }
 
