@@ -28,7 +28,7 @@ exec { & dotnet restore }
 
 # exec { & dotnet test .\test\PhantomNet.Entities.Tests -c Release }
 
-if ($env:APPVEYOR_REPO_TAG) {
+if ($env:APPVEYOR_REPO_TAG -eq $true) {
 	exec { & dotnet pack .\src\PhantomNet.Entities.EntityMarkers -c Release -o ..\..\artifacts }
 	exec { & dotnet pack .\src\PhantomNet.Entities -c Release -o ..\..\artifacts }
 	exec { & dotnet pack .\src\extensions\PhantomNet.Entities.EntityFrameworkCore -c Release -o ..\..\..\artifacts }
