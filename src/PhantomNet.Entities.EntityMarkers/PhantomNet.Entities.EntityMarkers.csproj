@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>PhantomNet.Entities.EntityMarkers class library</Description>
+    <Copyright>Green Grass</Copyright>
+    <AssemblyTitle>PhantomNet.Entities.EntityMarkers</AssemblyTitle>
+    <VersionPrefix>1.0.3-beta</VersionPrefix>
+    <Authors>Minh Nguyen</Authors>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <AssemblyName>PhantomNet.Entities.EntityMarkers</AssemblyName>
+    <PackageId>PhantomNet.Entities.EntityMarkers</PackageId>
+    <PackageProjectUrl>https://github.com/green-grass/PhantomNet-Entities</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/green-grass/PhantomNet-Entities/blob/master/LICENSE</PackageLicenseUrl>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+</Project>

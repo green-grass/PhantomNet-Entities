@@ -1,26 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AD2590CB-F7A8-45ED-BB5B-8A4E4B76EE3F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7AA1BF06-D068-4DC8-9634-111EB0BE87CC}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
 		Build.ps1 = Build.ps1
-		global.json = global.json
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PhantomNet.Entities", "src\PhantomNet.Entities\PhantomNet.Entities.xproj", "{A130E586-507C-4482-91F3-8CD09205B241}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PhantomNet.Entities.EntityMarkers", "src\PhantomNet.Entities.EntityMarkers\PhantomNet.Entities.EntityMarkers.xproj", "{6BC0163A-C077-4166-A92A-480F15D99F4B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{796F6555-8296-4F2F-B403-F9CEBE97EE82}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PhantomNet.Entities.Mvc", "src\extensions\PhantomNet.Entities.Mvc\PhantomNet.Entities.Mvc.xproj", "{CD81E391-A3E5-4CE3-9EAD-722566849C0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhantomNet.Entities", "src\PhantomNet.Entities\PhantomNet.Entities.csproj", "{A130E586-507C-4482-91F3-8CD09205B241}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PhantomNet.Entities.EntityFrameworkCore", "src\extensions\PhantomNet.Entities.EntityFrameworkCore\PhantomNet.Entities.EntityFrameworkCore.xproj", "{165F1F6A-3A85-4180-8371-FB04DB1C5CBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhantomNet.Entities.EntityMarkers", "src\PhantomNet.Entities.EntityMarkers\PhantomNet.Entities.EntityMarkers.csproj", "{6BC0163A-C077-4166-A92A-480F15D99F4B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhantomNet.Entities.Mvc", "src\extensions\PhantomNet.Entities.Mvc\PhantomNet.Entities.Mvc.csproj", "{CD81E391-A3E5-4CE3-9EAD-722566849C0F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhantomNet.Entities.EntityFrameworkCore", "src\extensions\PhantomNet.Entities.EntityFrameworkCore\PhantomNet.Entities.EntityFrameworkCore.csproj", "{165F1F6A-3A85-4180-8371-FB04DB1C5CBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,10 +49,13 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{796F6555-8296-4F2F-B403-F9CEBE97EE82} = {AD2590CB-F7A8-45ED-BB5B-8A4E4B76EE3F}
 		{A130E586-507C-4482-91F3-8CD09205B241} = {AD2590CB-F7A8-45ED-BB5B-8A4E4B76EE3F}
 		{6BC0163A-C077-4166-A92A-480F15D99F4B} = {AD2590CB-F7A8-45ED-BB5B-8A4E4B76EE3F}
-		{796F6555-8296-4F2F-B403-F9CEBE97EE82} = {AD2590CB-F7A8-45ED-BB5B-8A4E4B76EE3F}
 		{CD81E391-A3E5-4CE3-9EAD-722566849C0F} = {796F6555-8296-4F2F-B403-F9CEBE97EE82}
 		{165F1F6A-3A85-4180-8371-FB04DB1C5CBD} = {796F6555-8296-4F2F-B403-F9CEBE97EE82}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87101846-AFF5-4077-B278-E578FA797D1C}
 	EndGlobalSection
 EndGlobal

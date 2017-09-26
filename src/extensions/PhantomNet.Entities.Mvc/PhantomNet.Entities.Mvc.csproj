@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>PhantomNet.Entities.Mvc class library</Description>
+    <Copyright>Green Grass</Copyright>
+    <AssemblyTitle>PhantomNet.Entities.Mvc</AssemblyTitle>
+    <VersionPrefix>1.0.3-beta</VersionPrefix>
+    <Authors>Minh Nguyen</Authors>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <AssemblyName>PhantomNet.Entities.Mvc</AssemblyName>
+    <PackageId>PhantomNet.Entities.Mvc</PackageId>
+    <PackageProjectUrl>https://github.com/green-grass/PhantomNet-Entities</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/green-grass/PhantomNet-Entities/blob/master/LICENSE</PackageLicenseUrl>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PhantomNet.Entities\PhantomNet.Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="5.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="1.1.2" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>PhantomNet.Entities class library</Description>
+    <Copyright>Green Grass</Copyright>
+    <AssemblyTitle>PhantomNet.Entities</AssemblyTitle>
+    <VersionPrefix>1.0.3-beta</VersionPrefix>
+    <Authors>Minh Nguyen</Authors>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <AssemblyName>PhantomNet.Entities</AssemblyName>
+    <PackageId>PhantomNet.Entities</PackageId>
+    <PackageProjectUrl>https://github.com/green-grass/PhantomNet-Entities</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/green-grass/PhantomNet-Entities/blob/master/LICENSE</PackageLicenseUrl>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhantomNet.Entities.EntityMarkers\PhantomNet.Entities.EntityMarkers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="1.1.1" />
+    <PackageReference Include="PhantomNet.Core" Version="1.0.3-*" />
+    <PackageReference Include="System.Globalization.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
